@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed, inject, HostListener, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, inject, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { EmployeeService, Employee } from '../../services/employee.service';
@@ -13,7 +13,12 @@ export interface OrgNode extends Employee {
   templateUrl: './org-chart.component.html',
   styleUrls: ['./org-chart.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink]
+  imports: [CommonModule, RouterLink],
+  // FIX: Replaced @HostListener with the host property for better practice.
+  host: {
+    '(window:mousemove)': 'onPanMove($event)',
+    '(window:mouseup)': 'onPanEnd()',
+  },
 })
 export class OrgChartComponent implements AfterViewInit {
   private employeeService = inject(EmployeeService);
@@ -42,7 +47,8 @@ export class OrgChartComponent implements AfterViewInit {
   
   tree = computed(() => {
     const employees = this.allEmployees();
-    const map = new Map(employees.map(e => [e.id, { ...e, children: [] }]));
+    // FIX: Explicitly type children as OrgNode[] to aid with type inference.
+    const map = new Map(employees.map(e => [e.id, { ...e, children: [] as OrgNode[] }]));
     const roots: OrgNode[] = [];
 
     for (const employee of employees) {
@@ -51,7 +57,10 @@ export class OrgChartComponent implements AfterViewInit {
         roots.push(node);
       } else {
         const manager = map.get(employee.managerId);
-        manager?.children.push(node);
+        // FIX: Added a check to ensure manager exists before pushing a child.
+        if (manager) {
+          manager.children.push(node);
+        }
       }
     }
     return roots;
@@ -115,7 +124,6 @@ export class OrgChartComponent implements AfterViewInit {
     this.panStart.y = event.clientY - this.panOffset().y;
   }
 
-  @HostListener('window:mousemove', ['$event'])
   onPanMove(event: MouseEvent): void {
     if (!this.isPanning()) return;
     this.panOffset.set({
@@ -124,7 +132,6 @@ export class OrgChartComponent implements AfterViewInit {
     });
   }
 
-  @HostListener('window:mouseup')
   onPanEnd(): void {
     this.isPanning.set(false);
   }

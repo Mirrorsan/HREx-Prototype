@@ -1,96 +1,124 @@
-<div class="p-4 sm:p-6 lg:p-8 h-full">
+<div class="p-4 sm:p-6 lg:p-8">
   @if (employee(); as emp) {
-    <div class="bg-white rounded-xl shadow-sm h-full flex flex-col p-6">
-      <!-- Header -->
-      <div class="flex items-center justify-between pb-4 border-b border-slate-200">
-        <div class="flex items-center gap-4">
-          <button (click)="goBack()" class="p-2 rounded-full hover:bg-slate-100">
-            <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-          </button>
-          <h1 class="text-2xl font-bold text-slate-800">Employee Profile</h1>
-        </div>
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
+      <div class="flex items-center gap-4">
+        <img [src]="emp.avatar" class="w-24 h-24 rounded-full object-cover ring-4 ring-white shadow-md">
         <div>
-          <!-- Future action buttons like "Save" can go here -->
+          <h1 class="text-3xl font-bold text-slate-800">{{ emp.name }}</h1>
+          <p class="text-lg text-slate-500">{{ emp.jobTitle }}</p>
+        </div>
+      </div>
+      <button (click)="goBack()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Back to People
+      </button>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      
+      <!-- Left Column -->
+      <div class="xl:col-span-2 space-y-6">
+        <!-- Personal & Contact Information -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Personal & Contact Information</h2>
+          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+            <div class="sm:col-span-2">
+              <dt class="font-medium text-slate-500">Full Name</dt>
+              <dd class="mt-1 text-slate-900">{{ emp.name }}</dd>
+            </div>
+            <div>
+              <dt class="font-medium text-slate-500">Nickname</dt>
+              <dd class="mt-1 text-slate-900">{{ emp.nickname }}</dd>
+            </div>
+            <div>
+              <dt class="font-medium text-slate-500">Date of Birth</dt>
+              <dd class="mt-1 text-slate-900">{{ emp.dateOfBirth | date:'longDate' }}</dd>
+            </div>
+            <div>
+              <dt class="font-medium text-slate-500">Work Email</dt>
+              <dd class="mt-1 text-slate-900">{{ emp.email }}</dd>
+            </div>
+            <div>
+              <dt class="font-medium text-slate-500">Phone</dt>
+              <dd class="mt-1 text-slate-900">{{ emp.phone }}</dd>
+            </div>
+             <div class="sm:col-span-2">
+              <dt class="font-medium text-slate-500">Current Address</dt>
+              <dd class="mt-1 text-slate-900">{{ emp.currentAddress }}</dd>
+            </div>
+             <div class="sm:col-span-2">
+              <dt class="font-medium text-slate-500">Permanent Address</dt>
+              <dd class="mt-1 text-slate-900">{{ emp.permanentAddress }}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- Job Details -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+           <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Job Details</h2>
+           <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+              <div>
+                <dt class="font-medium text-slate-500">Job Title</dt>
+                <dd class="mt-1 text-slate-900">{{ emp.jobTitle }}</dd>
+              </div>
+              <div>
+                <dt class="font-medium text-slate-500">Department</dt>
+                <dd class="mt-1 text-slate-900">{{ emp.department }}</dd>
+              </div>
+              <div>
+                <dt class="font-medium text-slate-500">Site Location</dt>
+                <dd class="mt-1 text-slate-900">{{ emp.siteEmoji }} {{ emp.site }}</dd>
+              </div>
+              <div>
+                <dt class="font-medium text-slate-500">Start Date</dt>
+                <dd class="mt-1 text-slate-900">{{ emp.startDate | date:'longDate' }}</dd>
+              </div>
+           </dl>
         </div>
       </div>
       
-      <!-- Profile Content -->
-      <div class="mt-6 flex-1 overflow-y-auto">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Left Column: Avatar & Basic Info -->
-          <div class="md:col-span-1 flex flex-col items-center text-center">
-            <img class="w-32 h-32 rounded-full ring-4 ring-slate-100 object-cover" [src]="emp.avatar" [alt]="emp.name + ' avatar'">
-            <h2 class="mt-4 text-2xl font-bold text-slate-900">{{ emp.name }}</h2>
-            <p class="text-slate-500">{{ emp.jobTitle }}</p>
-            <div class="mt-2">
-              @if (emp.status === 'Active') {
-                <span class="px-3 py-1 text-sm font-medium text-green-800 bg-green-100 rounded-full">Active</span>
-              } @else if (emp.status === 'On Leave') {
-                <span class="px-3 py-1 text-sm font-medium text-yellow-800 bg-yellow-100 rounded-full">On Leave</span>
-              } @else if (emp.status === 'Invited') {
-                <span class="px-3 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">Invited</span>
-              }
-            </div>
-          </div>
-
-          <!-- Right Column: Detailed Info -->
-          <div class="md:col-span-2 space-y-6">
-            <div class="p-4 border border-slate-200 rounded-lg">
-              <h3 class="font-semibold text-lg text-slate-800 mb-4">Personal Information</h3>
-              <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                <div class="flex flex-col">
-                  <dt class="text-slate-500">Full Name</dt>
-                  <dd class="text-slate-900 font-medium">{{ emp.name }}</dd>
-                </div>
-                <div class="flex flex-col">
-                  <dt class="text-slate-500">Nickname</dt>
-                  <dd class="text-slate-900 font-medium">{{ emp.nickname }}</dd>
-                </div>
-                <div class="flex flex-col sm:col-span-2">
-                  <dt class="text-slate-500">Email Address</dt>
-                  <dd class="text-slate-900 font-medium">{{ emp.email }}</dd>
-                </div>
-              </dl>
-            </div>
-            
-            <div class="p-4 border border-slate-200 rounded-lg">
-              <h3 class="font-semibold text-lg text-slate-800 mb-4">Job Details</h3>
-              <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                <div class="flex flex-col">
-                  <dt class="text-slate-500">Job Title</dt>
-                  <dd class="text-slate-900 font-medium">{{ emp.jobTitle }}</dd>
-                </div>
-                <div class="flex flex-col">
-                  <dt class="text-slate-500">Department</dt>
-                  <dd class="text-slate-900 font-medium">{{ emp.department }}</dd>
-                </div>
-                <div class="flex flex-col">
-                  <dt class="text-slate-500">Site</dt>
-                  <dd class="text-slate-900 font-medium">{{ emp.siteEmoji }} {{ emp.site }}</dd>
-                </div>
-                <div class="flex flex-col">
-                  <dt class="text-slate-500">Start Date</dt>
-                  <dd class="text-slate-900 font-medium">{{ emp.startDate | date: 'longDate' }}</dd>
-                </div>
-                <div class="flex flex-col">
-                  <dt class="text-slate-500">Salary</dt>
-                  <dd class="text-slate-900 font-medium">{{ emp.salary }} / year</dd>
-                </div>
-              </dl>
-            </div>
-          </div>
+      <!-- Right Column -->
+      <div class="space-y-6">
+        <!-- Identification -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+           <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Identification</h2>
+           <dl class="space-y-4 text-sm">
+             <div>
+                <dt class="font-medium text-slate-500">Citizen ID</dt>
+                <dd class="mt-1 text-slate-900">{{ emp.citizenId }}</dd>
+              </div>
+              <div>
+                <dt class="font-medium text-slate-500">Tax ID</dt>
+                <dd class="mt-1 text-slate-900">{{ emp.taxId }}</dd>
+              </div>
+           </dl>
+        </div>
+        
+        <!-- Emergency Contacts -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+           <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Emergency Contacts</h2>
+            @if(emp.emergencyContacts.length > 0) {
+              <div class="space-y-4">
+                @for(contact of emp.emergencyContacts; track contact.name) {
+                  <div>
+                     <p class="font-semibold text-slate-800">{{ contact.name }}</p>
+                     <p class="text-sm text-slate-500">{{ contact.relationship }}</p>
+                     <p class="text-sm text-slate-500">{{ contact.phone }}</p>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="text-sm text-slate-500">No emergency contacts listed.</p>
+            }
         </div>
       </div>
     </div>
   } @else {
-    <div class="flex items-center justify-center h-full">
-      <div class="text-center">
-        <h2 class="text-xl font-semibold text-slate-700">Employee not found</h2>
-        <p class="text-slate-500 mt-2">The employee you are looking for does not exist.</p>
-        <button (click)="goBack()" class="mt-4 px-4 py-2 text-sm font-medium text-white bg-slate-800 rounded-md hover:bg-slate-700">
-          Back to People List
-        </button>
-      </div>
+    <div class="text-center py-20">
+      <h2 class="text-xl font-semibold text-slate-600">Employee not found</h2>
+      <p class="text-slate-500 mt-2">The employee you are looking for does not exist or has been removed.</p>
     </div>
   }
 </div>
