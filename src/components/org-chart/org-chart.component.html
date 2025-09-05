@@ -10,12 +10,11 @@
 
   <!-- Zoomable and Pannable content wrapper -->
   <div 
-    class="absolute top-0 left-0"
+    class="absolute top-1/2 left-1/2"
     [class.transition-transform]="!isPanning()"
     [class.duration-300]="!isPanning()"
     [class.ease-in-out]="!isPanning()"
-    [style.transform]="'translate(' + panOffset().x + 'px, ' + panOffset().y + 'px) scale(' + zoomLevel() + ')'"
-    [style.transform-origin]="'0 0'"
+    [style.transform]="'translate(-50%, -50%) translate(' + panOffset().x + 'px, ' + panOffset().y + 'px) scale(' + zoomLevel() + ')'"
   >
     <!-- Tree starts here -->
     <div #chartContent class="org-tree">

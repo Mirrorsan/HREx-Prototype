@@ -71,8 +71,13 @@ export class OrgChartComponent implements AfterViewInit {
 
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
-    const contentWidth = content.offsetWidth;
-    const contentHeight = content.offsetHeight;
+
+    // Use getBoundingClientRect and divide by current zoom to get the unscaled size
+    const contentRect = content.getBoundingClientRect();
+    const currentZoom = this.zoomLevel();
+    const contentWidth = contentRect.width / currentZoom;
+    const contentHeight = contentRect.height / currentZoom;
+
 
     if (contentWidth === 0 || contentHeight === 0) return;
 
@@ -83,12 +88,7 @@ export class OrgChartComponent implements AfterViewInit {
     const newZoom = Math.min(scaleX, scaleY) * padding;
 
     this.zoomLevel.set(newZoom);
-
-    // Calculate offset to center the content
-    const newPanX = (containerWidth - contentWidth * newZoom) / 2;
-    const newPanY = (containerHeight - contentHeight * newZoom) / 2;
-
-    this.panOffset.set({ x: newPanX, y: newPanY });
+    this.panOffset.set({ x: 0, y: 0 });
   }
 
   zoomIn(): void {
