@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed, inject, HostListener } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, inject, HostListener, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { EmployeeService, Employee } from '../../services/employee.service';
@@ -15,10 +15,13 @@ export interface OrgNode extends Employee {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterLink]
 })
-export class OrgChartComponent {
+export class OrgChartComponent implements AfterViewInit {
   private employeeService = inject(EmployeeService);
   private authService = inject(AuthService);
   Math = Math;
+
+  @ViewChild('chartContainer') chartContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('chartContent') chartContent!: ElementRef<HTMLDivElement>;
   
   // Interaction states
   zoomLevel = signal(1);
@@ -54,6 +57,40 @@ export class OrgChartComponent {
     return roots;
   });
 
+  ngAfterViewInit(): void {
+    // Use setTimeout to allow the view to be fully rendered before measuring
+    setTimeout(() => this.fitAndCenter(), 0);
+  }
+
+  fitAndCenter(): void {
+    if (!this.chartContainer?.nativeElement || !this.chartContent?.nativeElement) {
+      return;
+    }
+    const container = this.chartContainer.nativeElement;
+    const content = this.chartContent.nativeElement;
+
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    const contentWidth = content.offsetWidth;
+    const contentHeight = content.offsetHeight;
+
+    if (contentWidth === 0 || contentHeight === 0) return;
+
+    // Add some padding to the view
+    const padding = 0.9;
+    const scaleX = containerWidth / contentWidth;
+    const scaleY = containerHeight / contentHeight;
+    const newZoom = Math.min(scaleX, scaleY) * padding;
+
+    this.zoomLevel.set(newZoom);
+
+    // Calculate offset to center the content
+    const newPanX = (containerWidth - contentWidth * newZoom) / 2;
+    const newPanY = (containerHeight - contentHeight * newZoom) / 2;
+
+    this.panOffset.set({ x: newPanX, y: newPanY });
+  }
+
   zoomIn(): void {
     this.zoomLevel.update(level => Math.min(level + 0.1, 1.5));
   }
@@ -63,8 +100,7 @@ export class OrgChartComponent {
   }
   
   centerView(): void {
-      this.zoomLevel.set(1);
-      this.panOffset.set({ x: 0, y: 0 });
+      this.fitAndCenter();
   }
 
   onPanStart(event: MouseEvent): void {

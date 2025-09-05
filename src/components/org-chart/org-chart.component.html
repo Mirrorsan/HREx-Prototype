@@ -1,5 +1,5 @@
 <!-- Main container for zoom and pan -->
-<div 
+<div #chartContainer
   class="relative w-full h-full bg-slate-50 overflow-hidden rounded-xl border border-slate-200" 
   (mousedown)="onPanStart($event)"
   [class.cursor-grab]="!isPanning()"
@@ -10,7 +10,7 @@
 
   <!-- Zoomable and Pannable content wrapper -->
   <div 
-    class="absolute top-1/2 left-1/2"
+    class="absolute top-0 left-0"
     [class.transition-transform]="!isPanning()"
     [class.duration-300]="!isPanning()"
     [class.ease-in-out]="!isPanning()"
@@ -18,7 +18,7 @@
     [style.transform-origin]="'0 0'"
   >
     <!-- Tree starts here -->
-    <div class="org-tree">
+    <div #chartContent class="org-tree">
       <ul>
         @for(node of tree(); track node.id) {
           <li>

@@ -83,8 +83,10 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
-              @for (employee of filteredEmployees(); track employee.id) {
-                <tr [class]="employee.selected ? 'bg-yellow-50' : ''">
+              @for (employee of filteredEmployees(); track employee.id; let i = $index) {
+                <tr class="animate-row" 
+                    [style.animation-delay]="i * 30 + 'ms'"
+                    [class]="employee.selected ? 'bg-yellow-50' : ''">
                   <td class="p-4">
                     <input type="checkbox" (change)="toggleSelection(employee.id)" [checked]="employee.selected" class="h-4 w-4 text-yellow-600 border-slate-300 rounded focus:ring-yellow-500">
                   </td>

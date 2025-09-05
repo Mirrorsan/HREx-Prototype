@@ -9,6 +9,7 @@ import { EmployeeService, Employee } from '../../services/employee.service';
 @Component({
   selector: 'app-people',
   templateUrl: './people.component.html',
+  styleUrls: ['./people.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [OrgChartComponent, AddEmployeeModalComponent, DatePipe],
 })
