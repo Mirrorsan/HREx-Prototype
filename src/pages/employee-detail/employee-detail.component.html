@@ -9,112 +9,190 @@
           <p class="text-lg text-slate-500">{{ emp.jobTitle }}</p>
         </div>
       </div>
-      <button (click)="goBack()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 flex items-center gap-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        Back to People
-      </button>
+      <div class="flex items-center gap-2">
+        @if(isEditing()) {
+           <button (click)="cancelEdit()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50">Cancel</button>
+           <button (click)="saveChanges()" [disabled]="profileForm.invalid" class="px-4 py-2 text-sm font-medium text-white bg-slate-800 rounded-md shadow-sm hover:bg-slate-700 disabled:bg-slate-400">Save Changes</button>
+        } @else {
+          @if(canEdit()) {
+            <button (click)="toggleEditMode()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 flex items-center gap-2">
+               <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+               Edit Profile
+            </button>
+          }
+          <button (click)="goBack()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to People
+          </button>
+        }
+      </div>
     </div>
 
     <!-- Details Grid -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      
-      <!-- Left Column -->
-      <div class="xl:col-span-2 space-y-6">
-        <!-- Personal & Contact Information -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Personal & Contact Information</h2>
-          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
-            <div class="sm:col-span-2">
-              <dt class="font-medium text-slate-500">Full Name</dt>
-              <dd class="mt-1 text-slate-900">{{ emp.name }}</dd>
-            </div>
-            <div>
-              <dt class="font-medium text-slate-500">Nickname</dt>
-              <dd class="mt-1 text-slate-900">{{ emp.nickname }}</dd>
-            </div>
-            <div>
-              <dt class="font-medium text-slate-500">Date of Birth</dt>
-              <dd class="mt-1 text-slate-900">{{ emp.dateOfBirth | date:'longDate' }}</dd>
-            </div>
-            <div>
-              <dt class="font-medium text-slate-500">Work Email</dt>
-              <dd class="mt-1 text-slate-900">{{ emp.email }}</dd>
-            </div>
-            <div>
-              <dt class="font-medium text-slate-500">Phone</dt>
-              <dd class="mt-1 text-slate-900">{{ emp.phone }}</dd>
-            </div>
-             <div class="sm:col-span-2">
-              <dt class="font-medium text-slate-500">Current Address</dt>
-              <dd class="mt-1 text-slate-900">{{ emp.currentAddress }}</dd>
-            </div>
-             <div class="sm:col-span-2">
-              <dt class="font-medium text-slate-500">Permanent Address</dt>
-              <dd class="mt-1 text-slate-900">{{ emp.permanentAddress }}</dd>
-            </div>
-          </dl>
-        </div>
+    <form [formGroup]="profileForm">
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        
+        <!-- Left Column -->
+        <div class="xl:col-span-2 space-y-6">
+          <!-- Personal & Contact Information -->
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Personal & Contact Information</h2>
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+              <div class="sm:col-span-2">
+                <dt class="font-medium text-slate-500">Full Name</dt>
+                @if(isEditing()) { <input formControlName="name" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"> }
+                @else { <dd class="mt-1 text-slate-900">{{ emp.name }}</dd> }
+              </div>
+              <div>
+                <dt class="font-medium text-slate-500">Nickname</dt>
+                @if(isEditing()) { <input formControlName="nickname" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"> }
+                @else { <dd class="mt-1 text-slate-900">{{ emp.nickname }}</dd> }
+              </div>
+              <div>
+                <dt class="font-medium text-slate-500">Date of Birth</dt>
+                @if(isEditing()) { <input type="date" formControlName="dateOfBirth" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"> }
+                @else { <dd class="mt-1 text-slate-900">{{ emp.dateOfBirth | date:'longDate' }}</dd> }
+              </div>
+              <div>
+                <dt class="font-medium text-slate-500">Work Email</dt>
+                @if(isEditing()) { <input type="email" formControlName="email" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"> }
+                @else { <dd class="mt-1 text-slate-900">{{ emp.email }}</dd> }
+              </div>
+              <div>
+                <dt class="font-medium text-slate-500">Phone</dt>
+                @if(isEditing()) { <input formControlName="phone" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"> }
+                @else { <dd class="mt-1 text-slate-900">{{ emp.phone }}</dd> }
+              </div>
+              <div class="sm:col-span-2">
+                <dt class="font-medium text-slate-500">Current Address</dt>
+                @if(isEditing()) { <textarea formControlName="currentAddress" rows="2" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"></textarea> }
+                @else { <dd class="mt-1 text-slate-900">{{ emp.currentAddress }}</dd> }
+              </div>
+              <div class="sm:col-span-2">
+                <dt class="font-medium text-slate-500">Permanent Address</dt>
+                 @if(isEditing()) { <textarea formControlName="permanentAddress" rows="2" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"></textarea> }
+                @else { <dd class="mt-1 text-slate-900">{{ emp.permanentAddress }}</dd> }
+              </div>
+            </dl>
+          </div>
 
-        <!-- Job Details -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
-           <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Job Details</h2>
-           <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
-              <div>
-                <dt class="font-medium text-slate-500">Job Title</dt>
-                <dd class="mt-1 text-slate-900">{{ emp.jobTitle }}</dd>
-              </div>
-              <div>
-                <dt class="font-medium text-slate-500">Department</dt>
-                <dd class="mt-1 text-slate-900">{{ emp.department }}</dd>
-              </div>
-              <div>
-                <dt class="font-medium text-slate-500">Site Location</dt>
-                <dd class="mt-1 text-slate-900">{{ emp.siteEmoji }} {{ emp.site }}</dd>
-              </div>
-              <div>
-                <dt class="font-medium text-slate-500">Start Date</dt>
-                <dd class="mt-1 text-slate-900">{{ emp.startDate | date:'longDate' }}</dd>
-              </div>
-           </dl>
-        </div>
-      </div>
-      
-      <!-- Right Column -->
-      <div class="space-y-6">
-        <!-- Identification -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
-           <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Identification</h2>
-           <dl class="space-y-4 text-sm">
-             <div>
-                <dt class="font-medium text-slate-500">Citizen ID</dt>
-                <dd class="mt-1 text-slate-900">{{ emp.citizenId }}</dd>
-              </div>
-              <div>
-                <dt class="font-medium text-slate-500">Tax ID</dt>
-                <dd class="mt-1 text-slate-900">{{ emp.taxId }}</dd>
-              </div>
-           </dl>
+          <!-- Job Details -->
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Job Details</h2>
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                <div>
+                  <dt class="font-medium text-slate-500">Job Title</dt>
+                  @if(isEditing()) { <input formControlName="jobTitle" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"> }
+                  @else { <dd class="mt-1 text-slate-900">{{ emp.jobTitle }}</dd> }
+                </div>
+                <div>
+                  <dt class="font-medium text-slate-500">Department</dt>
+                  @if(isEditing()) { <input formControlName="department" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"> }
+                  @else { <dd class="mt-1 text-slate-900">{{ emp.department }}</dd> }
+                </div>
+                <div>
+                  <dt class="font-medium text-slate-500">Site Location</dt>
+                   @if(isEditing()) { <input formControlName="site" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"> }
+                  @else { <dd class="mt-1 text-slate-900">{{ emp.siteEmoji }} {{ emp.site }}</dd> }
+                </div>
+                <div>
+                  <dt class="font-medium text-slate-500">Start Date</dt>
+                  <dd class="mt-1 text-slate-900">{{ emp.startDate | date:'longDate' }}</dd>
+                </div>
+            </dl>
+          </div>
+          
+          <!-- Employment History -->
+          <div class="bg-white rounded-xl shadow-sm p-6">
+             <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Employment History</h2>
+             @if(emp.employmentHistory?.length > 0) {
+              <table class="w-full text-sm text-left">
+                <thead class="text-xs text-slate-500 uppercase"><tr><th class="py-2 pr-3">Job Title</th><th class="py-2 px-3">Department</th><th class="py-2 px-3">Dates</th></tr></thead>
+                <tbody>
+                  @for(item of emp.employmentHistory; track item.startDate) {
+                    <tr class="border-b last:border-b-0">
+                      <td class="py-2 pr-3 font-medium text-slate-800">{{item.jobTitle}}</td>
+                      <td class="py-2 px-3 text-slate-600">{{item.department}}</td>
+                      <td class="py-2 px-3 text-slate-600">{{item.startDate | date}} - {{item.endDate ? (item.endDate | date) : 'Present'}}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+             } @else { <p class="text-sm text-slate-500">No history found.</p> }
+          </div>
+          
         </div>
         
-        <!-- Emergency Contacts -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
-           <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Emergency Contacts</h2>
-            @if(emp.emergencyContacts.length > 0) {
-              <div class="space-y-4">
-                @for(contact of emp.emergencyContacts; track contact.name) {
-                  <div>
-                     <p class="font-semibold text-slate-800">{{ contact.name }}</p>
-                     <p class="text-sm text-slate-500">{{ contact.relationship }}</p>
-                     <p class="text-sm text-slate-500">{{ contact.phone }}</p>
-                  </div>
-                }
-              </div>
-            } @else {
-              <p class="text-sm text-slate-500">No emergency contacts listed.</p>
-            }
+        <!-- Right Column -->
+        <div class="space-y-6">
+          <!-- Identification -->
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Identification</h2>
+            <dl class="space-y-4 text-sm">
+              <div>
+                  <dt class="font-medium text-slate-500">Citizen ID</dt>
+                  @if(isEditing()) { <input formControlName="citizenId" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"> }
+                  @else { <dd class="mt-1 text-slate-900">{{ emp.citizenId }}</dd> }
+                </div>
+                <div>
+                  <dt class="font-medium text-slate-500">Tax ID</dt>
+                  @if(isEditing()) { <input formControlName="taxId" class="mt-1 w-full border-slate-300 rounded-md shadow-sm text-sm"> }
+                  @else { <dd class="mt-1 text-slate-900">{{ emp.taxId }}</dd> }
+                </div>
+            </dl>
+          </div>
+          
+          <!-- Emergency Contacts -->
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Emergency Contacts</h2>
+              @if(emp.emergencyContacts?.length > 0) {
+                <div class="space-y-4">
+                  @for(contact of emp.emergencyContacts; track contact.name) {
+                    <div>
+                      <p class="font-semibold text-slate-800">{{ contact.name }}</p>
+                      <p class="text-sm text-slate-500">{{ contact.relationship }}</p>
+                      <p class="text-sm text-slate-500">{{ contact.phone }}</p>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="text-sm text-slate-500">No emergency contacts listed.</p>
+              }
+          </div>
+
+          <!-- Education -->
+          <div class="bg-white rounded-xl shadow-sm p-6">
+             <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Education</h2>
+             @if(emp.educationHistory?.length > 0) {
+               <div class="space-y-4">
+                  @for(item of emp.educationHistory; track item.institution) {
+                    <div>
+                      <p class="font-semibold text-slate-800">{{item.level}} in {{item.field}}</p>
+                      <p class="text-sm text-slate-500">{{item.institution}} ({{item.yearOfGraduation}})</p>
+                    </div>
+                  }
+                </div>
+             } @else { <p class="text-sm text-slate-500">No education history found.</p> }
+          </div>
+          
+          <!-- Certificates -->
+           <div class="bg-white rounded-xl shadow-sm p-6">
+             <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4">Certificates</h2>
+             @if(emp.certificates?.length > 0) {
+               <div class="space-y-4">
+                  @for(item of emp.certificates; track item.name) {
+                    <div>
+                      <p class="font-semibold text-slate-800">{{item.name}}</p>
+                      <p class="text-sm text-slate-500">Issued by {{item.issuer}} on {{item.issueDate | date}}</p>
+                      @if(item.expiryDate) { <p class="text-xs text-slate-500">Expires on {{item.expiryDate | date}}</p> }
+                    </div>
+                  }
+                </div>
+             } @else { <p class="text-sm text-slate-500">No certificates found.</p> }
+          </div>
         </div>
       </div>
-    </div>
+    </form>
   } @else {
     <div class="text-center py-20">
       <h2 class="text-xl font-semibold text-slate-600">Employee not found</h2>

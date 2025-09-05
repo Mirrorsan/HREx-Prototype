@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { OrgChartComponent } from '../../components/org-chart/org-chart.component';
 import { AuthService } from '../../services/auth.service';
-// FIX: The NewEmployee interface should be imported from the employee service where it is defined.
 import { AddEmployeeModalComponent } from '../../components/add-employee-modal/add-employee-modal.component';
 import { EmployeeService, Employee, NewEmployee } from '../../services/employee.service';
 

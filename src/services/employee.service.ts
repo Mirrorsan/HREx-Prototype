@@ -1,19 +1,30 @@
 import { Injectable, signal, computed } from '@angular/core';
 
-// This should ideally be in a shared types file, but for now, it's defined here.
-export interface NewEmployee {
-  name: string;
-  email: string;
-  jobTitle: string;
-  department: string;
-  site: string;
-  managerId: number | null;
-}
-
 export interface EmergencyContact {
   name: string;
   relationship: string;
   phone: string;
+}
+
+export interface EmploymentHistoryEntry {
+  jobTitle: string;
+  department: string;
+  startDate: string; // ISO string
+  endDate: string | null; // ISO string or null for current
+}
+
+export interface EducationEntry {
+  level: string; // e.g., Bachelor's, Master's
+  field: string;
+  institution: string;
+  yearOfGraduation: number;
+}
+
+export interface Certificate {
+  name: string;
+  issuer: string;
+  issueDate: string; // ISO string
+  expiryDate: string | null; // ISO string or null
 }
 
 export interface Employee {
@@ -24,156 +35,103 @@ export interface Employee {
   jobTitle: string;
   department: string;
   site: string;
-  siteEmoji: string;
   status: 'Active' | 'On Leave' | 'Invited';
   managerId: number | null;
+  startDate: string; // ISO string
   avatar: string;
-  startDate: string;
   selected: boolean;
-  salary: string;
   
   // New detailed fields from PRD
-  citizenId: string;
-  taxId: string;
   phone: string;
-  location: string;
-  dateOfBirth: string;
+  dateOfBirth: string; // ISO string
   currentAddress: string;
   permanentAddress: string;
+  citizenId: string;
+  taxId: string;
+  siteEmoji: string;
+  salary: string;
+  location: string;
+  
+  // New structured fields
   emergencyContacts: EmergencyContact[];
+  employmentHistory: EmploymentHistoryEntry[];
+  educationHistory: EducationEntry[];
+  certificates: Certificate[];
 }
 
+export type NewEmployee = Omit<Employee, 'id' | 'selected' | 'siteEmoji' | 'salary' | 'location' | 'emergencyContacts' | 'employmentHistory' | 'educationHistory' | 'certificates' | 'phone' | 'currentAddress' | 'permanentAddress'> & {
+  citizenId?: string;
+  taxId?: string;
+  dateOfBirth?: string;
+};
+
+
+// Lora Piterson from profile card
 const MOCK_EMPLOYEES: Employee[] = [
   { 
-    id: 1, name: 'Kathryn Murphy', nickname: 'Kat', email: 'kathryn.murphy@hrex.io', 
-    jobTitle: 'Chief Executive Officer', department: 'Executive', site: 'Headquarters', siteEmoji: '🏢', 
-    status: 'Active', managerId: null, avatar: 'https://picsum.photos/id/40/200/200', 
-    startDate: '2019-03-15', selected: false, salary: '$350,000',
-    citizenId: '1-1020-30405-67-8', taxId: '9876543210', phone: '+1-202-555-0191', 
-    location: 'New York, USA', dateOfBirth: '1980-05-20',
-    currentAddress: '123 Tech Ave, New York, NY 10001', permanentAddress: '123 Tech Ave, New York, NY 10001',
-    emergencyContacts: [{ name: 'Robert Murphy', relationship: 'Spouse', phone: '+1-202-555-0192' }]
+    id: 1, name: 'Lora Piterson', nickname: 'Lora', email: 'lora.piterson@example.com', jobTitle: 'CEO', department: 'Executive', site: 'HQ', status: 'Active', managerId: null, startDate: '2020-01-15T09:00:00Z', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=200&auto=format&fit=crop', selected: false,
+    phone: '+45 63 81 04 92', dateOfBirth: '1985-05-20', currentAddress: '123 Main St, Anytown, USA 12345', permanentAddress: '123 Main St, Anytown, USA 12345', citizenId: '123-456-7890', taxId: '987-654-3210', siteEmoji: '🏢', salary: '$120,000', location: 'Copenhagen, Denmark',
+    emergencyContacts: [{ name: 'John Piterson', relationship: 'Spouse', phone: '111-222-3333' }],
+    employmentHistory: [{ jobTitle: 'CEO', department: 'Executive', startDate: '2020-01-15T09:00:00Z', endDate: null }],
+    educationHistory: [{ level: 'Master of Business Administration', field: 'Business', institution: 'Copenhagen Business School', yearOfGraduation: 2010 }],
+    certificates: [{ name: 'Certified Professional in Human Resources (PHR)', issuer: 'HRCI', issueDate: '2015-06-01', expiryDate: '2025-06-01' }]
   },
   { 
-    id: 12, name: 'David Chen', nickname: 'Dave', email: 'david.chen@hrex.io', 
-    jobTitle: 'Chief Technology Officer', department: 'Executive', site: 'Headquarters', siteEmoji: '🏢', 
-    status: 'Active', managerId: 1, avatar: 'https://picsum.photos/id/60/200/200', 
-    startDate: '2019-08-01', selected: false, salary: '$275,000',
-    citizenId: '3-2109-87654-32-1', taxId: '1234509876', phone: '+1-202-555-0193', 
-    location: 'New York, USA', dateOfBirth: '1982-03-15',
-    currentAddress: '456 Innovation Dr, New York, NY 10001', permanentAddress: '456 Innovation Dr, New York, NY 10001',
-    emergencyContacts: [{ name: 'Linda Chen', relationship: 'Spouse', phone: '+1-202-555-0194' }]
+    id: 2, name: 'John Doe', nickname: 'John', email: 'john.doe@example.com', jobTitle: 'CTO', department: 'Engineering', site: 'HQ', status: 'Active', managerId: 1, startDate: '2020-02-01T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=john.doe@example.com', selected: false,
+    phone: '+1 555-0101', dateOfBirth: '1988-11-10', currentAddress: '456 Oak Ave, Anytown, USA 12345', permanentAddress: '456 Oak Ave, Anytown, USA 12345', citizenId: '234-567-8901', taxId: '876-543-2109', siteEmoji: '🏢', salary: '$110,000', location: 'New York, USA',
+    emergencyContacts: [{ name: 'Jane Doe', relationship: 'Spouse', phone: '444-555-6666' }],
+    employmentHistory: [{ jobTitle: 'CTO', department: 'Engineering', startDate: '2020-02-01T09:00:00Z', endDate: null }],
+    educationHistory: [{ level: 'Master of Science', field: 'Computer Science', institution: 'Stanford University', yearOfGraduation: 2012 }],
+    certificates: [{ name: 'AWS Certified Solutions Architect – Professional', issuer: 'Amazon Web Services', issueDate: '2019-03-15', expiryDate: '2025-03-15' }]
   },
   { 
-    id: 2, name: 'Mike Perkins', nickname: 'Mike', email: 'mike.perkins@hrex.io', 
-    jobTitle: 'Head of Engineering', department: 'Engineering', site: 'Headquarters', siteEmoji: '🏢', 
-    status: 'Active', managerId: 12, avatar: 'https://picsum.photos/id/41/200/200', 
-    startDate: '2020-01-20', selected: false, salary: '$180,000',
-    citizenId: '2-2030-40506-78-9', taxId: '8765432109', phone: '+1-202-555-0181', 
-    location: 'New York, USA', dateOfBirth: '1985-11-10',
-    currentAddress: '456 Code Ln, New York, NY 10001', permanentAddress: '456 Code Ln, New York, NY 10001',
-    emergencyContacts: [{ name: 'Sarah Perkins', relationship: 'Spouse', phone: '+1-202-555-0182' }]
+    id: 3, name: 'Jane Smith', nickname: 'Jane', email: 'jane.smith@example.com', jobTitle: 'CFO', department: 'Finance', site: 'HQ', status: 'Active', managerId: 1, startDate: '2020-03-10T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=jane.smith@example.com', selected: false,
+    phone: '+1 555-0102', dateOfBirth: '1990-01-25', currentAddress: '789 Pine St, Anytown, USA 12345', permanentAddress: '789 Pine St, Anytown, USA 12345', citizenId: '345-678-9012', taxId: '765-432-1098', siteEmoji: '🏢', salary: '$105,000', location: 'London, UK',
+    emergencyContacts: [{ name: 'Jim Smith', relationship: 'Brother', phone: '777-888-9999' }],
+    employmentHistory: [{ jobTitle: 'CFO', department: 'Finance', startDate: '2020-03-10T09:00:00Z', endDate: null }],
+    educationHistory: [{ level: 'Bachelor of Commerce', field: 'Accounting', institution: 'London School of Economics', yearOfGraduation: 2011 }],
+    certificates: [{ name: 'Certified Public Accountant (CPA)', issuer: 'AICPA', issueDate: '2013-08-20', expiryDate: null }]
   },
   { 
-    id: 3, name: 'Albert Slater', nickname: 'Al', email: 'albert.slater@hrex.io', 
-    jobTitle: 'Head of Product', department: 'Product', site: 'Headquarters', siteEmoji: '🏢', 
-    status: 'Active', managerId: 1, avatar: 'https://picsum.photos/id/42/200/200', 
-    startDate: '2020-02-10', selected: false, salary: '$175,000',
-    citizenId: '3-3040-50607-89-0', taxId: '7654321098', phone: '+1-202-555-0171', 
-    location: 'Remote', dateOfBirth: '1988-01-30',
-    currentAddress: '789 Feature Rd, Austin, TX 78701', permanentAddress: '789 Feature Rd, Austin, TX 78701',
-    emergencyContacts: [{ name: 'Jessica Slater', relationship: 'Spouse', phone: '+1-202-555-0172' }]
+    id: 4, name: 'Peter Jones', nickname: 'Peter', email: 'peter.jones@example.com', jobTitle: 'Lead Engineer', department: 'Engineering', site: 'Remote', status: 'Active', managerId: 2, startDate: '2021-05-20T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=peter.jones@example.com', selected: false,
+    phone: '+1 555-0103', dateOfBirth: '1992-07-30', currentAddress: '101 Maple Dr, Anytown, USA 12345', permanentAddress: '101 Maple Dr, Anytown, USA 12345', citizenId: '456-789-0123', taxId: '654-321-0987', siteEmoji: '🏠', salary: '$95,000', location: 'Berlin, Germany',
+    emergencyContacts: [{ name: 'Susan Jones', relationship: 'Mother', phone: '123-123-1234' }],
+    employmentHistory: [{ jobTitle: 'Lead Engineer', department: 'Engineering', startDate: '2021-05-20T09:00:00Z', endDate: null }],
+    educationHistory: [{ level: 'Bachelor of Engineering', field: 'Software Engineering', institution: 'University of Waterloo', yearOfGraduation: 2014 }],
+    certificates: []
   },
   { 
-    id: 4, name: 'Jane Doe', nickname: 'Jane', email: 'jane.doe@hrex.io', 
-    jobTitle: 'Head of Design', department: 'Design', site: 'Headquarters', siteEmoji: '🏢', 
-    status: 'Active', managerId: 1, avatar: 'https://picsum.photos/id/43/200/200', 
-    startDate: '2020-06-01', selected: false, salary: '$170,000',
-    citizenId: '4-4050-60708-90-1', taxId: '6543210987', phone: '+1-202-555-0161', 
-    location: 'San Francisco, USA', dateOfBirth: '1990-09-05',
-    currentAddress: '101 Pixel St, San Francisco, CA 94103', permanentAddress: '101 Pixel St, San Francisco, CA 94103',
-    emergencyContacts: [{ name: 'John Doe', relationship: 'Spouse', phone: '+1-202-555-0162' }]
+    id: 5, name: 'Mary Johnson', nickname: 'Mary', email: 'mary.johnson@example.com', jobTitle: 'Senior Engineer', department: 'Engineering', site: 'HQ', status: 'On Leave', managerId: 2, startDate: '2021-06-15T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=mary.johnson@example.com', selected: false,
+    phone: '+1 555-0104', dateOfBirth: '1993-02-14', currentAddress: '212 Birch Rd, Anytown, USA 12345', permanentAddress: '212 Birch Rd, Anytown, USA 12345', citizenId: '567-890-1234', taxId: '543-210-9876', siteEmoji: '🏢', salary: '$85,000', location: 'Tokyo, Japan',
+    emergencyContacts: [{ name: 'Robert Johnson', relationship: 'Father', phone: '234-234-2345' }],
+    employmentHistory: [{ jobTitle: 'Senior Engineer', department: 'Engineering', startDate: '2021-06-15T09:00:00Z', endDate: null }],
+    educationHistory: [{ level: 'Bachelor of Science', field: 'Computer Engineering', institution: 'University of Tokyo', yearOfGraduation: 2015 }],
+    certificates: []
   },
   { 
-    id: 5, name: 'Anatoly Belik', nickname: 'Toly', email: 'anatoly.belik@hrex.io', 
-    jobTitle: 'Platform Engineering Lead', department: 'Engineering', site: 'Remote', siteEmoji: '🏠', 
-    status: 'Active', managerId: 2, avatar: 'https://picsum.photos/id/44/200/200', 
-    startDate: '2021-03-22', selected: false, salary: '$150,000',
-    citizenId: '5-5060-70809-01-2', taxId: '5432109876', phone: '+1-202-555-0151', 
-    location: 'Berlin, Germany', dateOfBirth: '1992-02-14',
-    currentAddress: '22 DevOps Way, Berlin, Germany', permanentAddress: '22 DevOps Way, Berlin, Germany',
-    emergencyContacts: [{ name: 'Olga Belik', relationship: 'Mother', phone: '+49-30-555-0152' }]
+    id: 6, name: 'Chris Lee', nickname: 'Chris', email: 'chris.lee@example.com', jobTitle: 'Accountant', department: 'Finance', site: 'HQ', status: 'Active', managerId: 3, startDate: '2022-01-10T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=chris.lee@example.com', selected: false,
+    phone: '+1 555-0105', dateOfBirth: '1995-09-05', currentAddress: '333 Cedar Ln, Anytown, USA 12345', permanentAddress: '333 Cedar Ln, Anytown, USA 12345', citizenId: '678-901-2345', taxId: '432-109-8765', siteEmoji: '🏢', salary: '$75,000', location: 'Sydney, Australia',
+    emergencyContacts: [{ name: 'Michelle Lee', relationship: 'Sister', phone: '345-345-3456' }],
+    employmentHistory: [{ jobTitle: 'Accountant', department: 'Finance', startDate: '2022-01-10T09:00:00Z', endDate: null }],
+    educationHistory: [{ level: 'Bachelor of Business', field: 'Finance', institution: 'University of Sydney', yearOfGraduation: 2017 }],
+    certificates: []
   },
   { 
-    id: 6, name: 'Susan Smith', nickname: 'Sue', email: 'susan.smith@hrex.io', 
-    jobTitle: 'Product Manager', department: 'Product', site: 'Headquarters', siteEmoji: '🏢', 
-    status: 'Active', managerId: 3, avatar: 'https://picsum.photos/id/45/200/200', 
-    startDate: '2021-08-16', selected: false, salary: '$140,000',
-    citizenId: '6-6070-80901-12-3', taxId: '4321098765', phone: '+1-202-555-0141', 
-    location: 'New York, USA', dateOfBirth: '1993-07-25',
-    currentAddress: '33 Roadmap Blvd, New York, NY 10001', permanentAddress: '33 Roadmap Blvd, New York, NY 10001',
-    emergencyContacts: [{ name: 'David Smith', relationship: 'Brother', phone: '+1-202-555-0142' }]
+    id: 7, name: 'Patricia Brown', nickname: 'Pat', email: 'patricia.brown@example.com', jobTitle: 'Junior Accountant', department: 'Finance', site: 'Remote', status: 'Invited', managerId: 3, startDate: '2023-08-01T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=patricia.brown@example.com', selected: false,
+    phone: '+1 555-0106', dateOfBirth: '1998-03-12', currentAddress: '444 Spruce Way, Anytown, USA 12345', permanentAddress: '444 Spruce Way, Anytown, USA 12345', citizenId: '789-012-3456', taxId: '321-098-7654', siteEmoji: '🏠', salary: '$60,000', location: 'Toronto, Canada',
+    emergencyContacts: [{ name: 'David Brown', relationship: 'Father', phone: '456-456-4567' }],
+    employmentHistory: [{ jobTitle: 'Junior Accountant', department: 'Finance', startDate: '2023-08-01T09:00:00Z', endDate: null }],
+    educationHistory: [{ level: 'Diploma', field: 'Accounting', institution: 'Toronto School of Business', yearOfGraduation: 2020 }],
+    certificates: []
   },
   { 
-    id: 7, name: 'Mark Durden', nickname: 'Mark', email: 'mark.durden@hrex.io', 
-    jobTitle: 'Senior Software Engineer', department: 'Engineering', site: 'Remote', siteEmoji: '🏠', 
-    status: 'On Leave', managerId: 5, avatar: 'https://picsum.photos/id/46/200/200', 
-    startDate: '2022-01-10', selected: false, salary: '$130,000',
-    citizenId: '7-7080-90102-23-4', taxId: '3210987654', phone: '+1-202-555-0131', 
-    location: 'London, UK', dateOfBirth: '1991-04-01',
-    currentAddress: '44 Commit Crescent, London, UK', permanentAddress: '44 Commit Crescent, London, UK',
-    emergencyContacts: [{ name: 'Emily Durden', relationship: 'Spouse', phone: '+44-20-7946-0132' }]
+    id: 8, name: 'Michael Williams', nickname: 'Mike', email: 'michael.williams@example.com', jobTitle: 'Frontend Developer', department: 'Engineering', site: 'HQ', status: 'Active', managerId: 4, startDate: '2022-09-01T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=michael.williams@example.com', selected: false,
+    phone: '+1 555-0107', dateOfBirth: '1996-12-24', currentAddress: '555 Redwood Blvd, Anytown, USA 12345', permanentAddress: '555 Redwood Blvd, Anytown, USA 12345', citizenId: '890-123-4567', taxId: '210-987-6543', siteEmoji: '🏢', salary: '$80,000', location: 'San Francisco, USA',
+    emergencyContacts: [{ name: 'Laura Williams', relationship: 'Wife', phone: '567-567-5678' }],
+    employmentHistory: [{ jobTitle: 'Frontend Developer', department: 'Engineering', startDate: '2022-09-01T09:00:00Z', endDate: null }],
+    educationHistory: [{ level: 'Bachelor of Arts', field: 'Web Design and Development', institution: 'Academy of Art University', yearOfGraduation: 2018 }],
+    certificates: [{ name: 'Certified JavaScript Developer', issuer: 'W3Schools', issueDate: '2021-01-15', expiryDate: null }]
   },
-  { 
-    id: 8, name: 'Kirsten Drucker', nickname: 'Kirsten', email: 'kirsten.drucker@hrex.io', 
-    jobTitle: 'DevOps Engineer', department: 'Engineering', site: 'Remote', siteEmoji: '🏠', 
-    status: 'Active', managerId: 5, avatar: 'https://picsum.photos/id/47/200/200', 
-    startDate: '2022-05-30', selected: false, salary: '$125,000',
-    citizenId: '8-8090-10203-34-5', taxId: '2109876543', phone: '+1-202-555-0121', 
-    location: 'Austin, USA', dateOfBirth: '1994-03-12',
-    currentAddress: '55 Pipeline Pl, Austin, TX 78701', permanentAddress: '55 Pipeline Pl, Austin, TX 78701',
-    emergencyContacts: [{ name: 'Henry Drucker', relationship: 'Father', phone: '+1-202-555-0122' }]
-  },
-  {
-    id: 9, name: 'Chris Blair', nickname: 'Chris', email: 'chris.blair@hrex.io', 
-    jobTitle: 'Senior UI/UX Designer', department: 'Design', site: 'Headquarters', siteEmoji: '🏢', 
-    status: 'Active', managerId: 4, avatar: 'https://picsum.photos/id/48/200/200', 
-    startDate: '2021-09-01', selected: false, salary: '$135,000',
-    citizenId: '9-9010-20304-45-6', taxId: '1098765432', phone: '+1-202-555-0111', 
-    location: 'San Francisco, USA', dateOfBirth: '1989-08-15',
-    currentAddress: '66 Component Ct, San Francisco, CA 94103', permanentAddress: '66 Component Ct, San Francisco, CA 94103',
-    emergencyContacts: [{ name: 'Maria Blair', relationship: 'Spouse', phone: '+1-202-555-0112' }]
-  },
-  {
-    id: 10, name: 'Hannah Perkins', nickname: 'Hannah', email: 'hannah.perkins@hrex.io', 
-    jobTitle: 'UX Designer', department: 'Design', site: 'Remote', siteEmoji: '🏠', 
-    status: 'Active', managerId: 4, avatar: 'https://picsum.photos/id/49/200/200', 
-    startDate: '2022-08-01', selected: false, salary: '$105,000',
-    citizenId: '1-0011-22334-56-7', taxId: '0987654321', phone: '+1-202-555-0101', 
-    location: 'Portland, USA', dateOfBirth: '1995-06-22',
-    currentAddress: '77 User Flow Ave, Portland, OR 97204', permanentAddress: '77 User Flow Ave, Portland, OR 97204',
-    emergencyContacts: [{ name: 'Michael Perkins', relationship: 'Father', phone: '+1-202-555-0102' }]
-  },
-   { 
-    id: 11, name: 'Ksenia Bator', nickname: 'Ksenia', email: 'ksenia.bator@hrex.io', 
-    jobTitle: 'Marketing Specialist', department: 'Marketing', site: 'Remote', siteEmoji: '🏠', 
-    status: 'Invited', managerId: 3, avatar: 'https://picsum.photos/id/50/200/200', 
-    startDate: '2023-01-15', selected: false, salary: '$95,000',
-    citizenId: '2-1122-33445-67-8', taxId: '9876543210-A', phone: '+1-202-555-0201', 
-    location: 'Miami, USA', dateOfBirth: '1996-10-18',
-    currentAddress: '88 Campaign Rd, Miami, FL 33131', permanentAddress: '88 Campaign Rd, Miami, FL 33131',
-    emergencyContacts: [{ name: 'Ivan Bator', relationship: 'Father', phone: '+1-202-555-0202' }]
-  },
-  {
-    id: 13, name: 'Olivia Garcia', nickname: 'Liv', email: 'olivia.garcia@hrex.io',
-    jobTitle: 'Project Manager', department: 'Product', site: 'Remote', siteEmoji: '🏠',
-    status: 'Active', managerId: 3, avatar: 'https://picsum.photos/id/51/200/200',
-    startDate: '2022-11-20', selected: false, salary: '$115,000',
-    citizenId: '4-3210-98765-43-2', taxId: '1122334455', phone: '+1-202-555-0211',
-    location: 'Chicago, USA', dateOfBirth: '1993-01-10',
-    currentAddress: '99 Gantt Chart Ln, Chicago, IL 60601', permanentAddress: '99 Gantt Chart Ln, Chicago, IL 60601',
-    emergencyContacts: [{ name: 'Carlos Garcia', relationship: 'Husband', phone: '+1-202-555-0212' }]
-  }
 ];
 
 @Injectable({
@@ -185,58 +143,78 @@ export class EmployeeService {
   getEmployees() {
     return this.employees.asReadonly();
   }
-  
+
   getEmployee(id: number) {
     return computed(() => this.employees().find(e => e.id === id));
   }
 
-  addEmployee(newEmployeeData: NewEmployee): void {
-    const newId = Math.max(...this.employees().map(e => e.id)) + 1;
-    const newEmployee: Employee = {
-      ...newEmployeeData,
-      id: newId,
-      nickname: newEmployeeData.name.split(' ')[0], // Simple default
-      siteEmoji: newEmployeeData.site === 'Remote' ? '🏠' : '🏢',
-      status: 'Invited',
-      avatar: `https://picsum.photos/id/${newId + 50}/200/200`, // a little offset for variety
-      startDate: new Date().toISOString().split('T')[0],
-      selected: false,
-      salary: '$90,000', // Default salary for new hires
-      citizenId: 'N/A',
-      taxId: 'N/A',
-      phone: 'N/A',
-      location: 'N/A',
-      dateOfBirth: 'N/A',
-      currentAddress: 'N/A',
-      permanentAddress: 'N/A',
-      emergencyContacts: []
-    };
-    this.employees.update(currentEmployees => [newEmployee, ...currentEmployees]);
-  }
-
-  deleteEmployee(employeeId: number): void {
-    this.employees.update(current => current.filter(e => e.id !== employeeId));
-  }
-  
-  changeStatus(employeeId: number, newStatus: Employee['status']): void {
-    this.employees.update(current => 
-      current.map(e => e.id === employeeId ? { ...e, status: newStatus } : e)
-    );
-  }
-  
-  updateManager(employeeId: number, newManagerId: number): void {
-    this.employees.update(current => 
-      current.map(e => e.id === employeeId ? { ...e, managerId: newManagerId } : e)
-    );
-  }
-
   toggleSelection(employeeId: number): void {
-    this.employees.update(current => 
-      current.map(e => e.id === employeeId ? { ...e, selected: !e.selected } : e)
+    this.employees.update(employees =>
+      employees.map(emp =>
+        emp.id === employeeId ? { ...emp, selected: !emp.selected } : emp
+      )
     );
   }
 
   toggleAllSelection(isChecked: boolean): void {
-    this.employees.update(current => current.map(e => ({ ...e, selected: isChecked })));
+    this.employees.update(employees =>
+      employees.map(emp => ({ ...emp, selected: isChecked }))
+    );
+  }
+
+  addEmployee(newEmployeeData: NewEmployee): void {
+    this.employees.update(employees => {
+        const newId = employees.length > 0 ? Math.max(...employees.map(e => e.id)) + 1 : 1;
+        const newEmployee: Employee = {
+            ...newEmployeeData,
+            id: newId,
+            selected: false,
+            phone: '',
+            dateOfBirth: newEmployeeData.dateOfBirth || '',
+            currentAddress: '',
+            permanentAddress: '',
+            citizenId: newEmployeeData.citizenId || '',
+            taxId: newEmployeeData.taxId || '',
+            siteEmoji: '🏢',
+            salary: '$50,000', // Default salary
+            location: 'To be determined',
+            emergencyContacts: [],
+            employmentHistory: [{
+              jobTitle: newEmployeeData.jobTitle,
+              department: newEmployeeData.department,
+              startDate: newEmployeeData.startDate,
+              endDate: null
+            }],
+            educationHistory: [],
+            certificates: [],
+        };
+        return [newEmployee, ...employees];
+    });
+  }
+  
+  updateEmployee(updatedEmployee: Employee): void {
+    this.employees.update(employees =>
+      employees.map(emp => (emp.id === updatedEmployee.id ? updatedEmployee : emp))
+    );
+  }
+
+  deleteEmployee(employeeId: number): void {
+    this.employees.update(employees => employees.filter(emp => emp.id !== employeeId));
+  }
+
+  changeStatus(employeeId: number, newStatus: Employee['status']): void {
+    this.employees.update(employees =>
+      employees.map(emp =>
+        emp.id === employeeId ? { ...emp, status: newStatus } : emp
+      )
+    );
+  }
+
+  updateManager(employeeId: number, newManagerId: number): void {
+    this.employees.update(employees =>
+      employees.map(emp =>
+        emp.id === employeeId ? { ...emp, managerId: newManagerId } : emp
+      )
+    );
   }
 }

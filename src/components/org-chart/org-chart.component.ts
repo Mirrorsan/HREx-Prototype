@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal, computed, inject, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+// FIX: Implement EmployeeService to resolve import and type errors.
 import { EmployeeService, Employee } from '../../services/employee.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -14,7 +15,6 @@ export interface OrgNode extends Employee {
   styleUrls: ['./org-chart.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterLink],
-  // FIX: Replaced @HostListener with the host property for better practice.
   host: {
     '(window:mousemove)': 'onPanMove($event)',
     '(window:mouseup)': 'onPanEnd()',
@@ -47,7 +47,6 @@ export class OrgChartComponent implements AfterViewInit {
   
   tree = computed(() => {
     const employees = this.allEmployees();
-    // FIX: Explicitly type children as OrgNode[] to aid with type inference.
     const map = new Map(employees.map(e => [e.id, { ...e, children: [] as OrgNode[] }]));
     const roots: OrgNode[] = [];
 
@@ -57,7 +56,6 @@ export class OrgChartComponent implements AfterViewInit {
         roots.push(node);
       } else {
         const manager = map.get(employee.managerId);
-        // FIX: Added a check to ensure manager exists before pushing a child.
         if (manager) {
           manager.children.push(node);
         }
@@ -164,7 +162,7 @@ export class OrgChartComponent implements AfterViewInit {
     if (!this.canManageChart() || !this.draggedNode()) return;
     
     // Prevent dropping on itself or its own children
-    if (this.draggedNode()!.id === potentialTarget.id || this.isDescendant(this.draggedNode()!, potentialTarget.id)) {
+    if (this.draggedNode()!.id === potentialTarget.id || this.isDescendant(this.draggedNode()!, potentialTarget)) {
         this.dropTargetNode.set(null);
         return;
     }
@@ -173,10 +171,10 @@ export class OrgChartComponent implements AfterViewInit {
     this.dropTargetNode.set(potentialTarget);
   }
   
-  private isDescendant(node: OrgNode, potentialChildId: number): boolean {
-    if (node.id === potentialChildId) return true;
+  private isDescendant(node: OrgNode, potentialChild: OrgNode): boolean {
+    if (node.id === potentialChild.id) return true;
     for (const child of node.children) {
-      if (this.isDescendant(child, potentialChildId)) return true;
+      if (this.isDescendant(child, potentialChild)) return true;
     }
     return false;
   }
