@@ -14,8 +14,14 @@ export interface OrgNode {
   selector: 'app-org-chart',
   templateUrl: './org-chart.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(window:mousemove)': 'onPanMove($event)',
+    '(window:mouseup)': 'onPanEnd()',
+  },
 })
 export class OrgChartComponent {
+  protected readonly Math = Math;
+
   treeData = signal<OrgNode>({
     id: 'director-1',
     name: 'Thomas Edison',
@@ -58,9 +64,18 @@ export class OrgChartComponent {
     ],
   });
 
+  // Drag & Drop State
   draggedNodeInfo = signal<{ node: OrgNode; parent: OrgNode } | null>(null);
   dropTargetId = signal<string | null>(null);
 
+  // Zoom & Pan State
+  zoomLevel = signal(1); // 1 = 100%
+  isPanning = signal(false);
+  panOffset = signal({ x: 0, y: 0 });
+  panStart = signal({ x: 0, y: 0 });
+
+
+  // --- Drag & Drop Handlers ---
   handleDragStart(node: OrgNode, parent: OrgNode, event: DragEvent): void {
     event.dataTransfer?.setData('text/plain', node.id);
     this.draggedNodeInfo.set({ node, parent });
@@ -90,7 +105,6 @@ export class OrgChartComponent {
 
     this.treeData.update(currentTree => {
       const newTree = JSON.parse(JSON.stringify(currentTree));
-
       const findNode = (root: OrgNode, nodeId: string): OrgNode | null => {
         if (root.id === nodeId) return root;
         for (const child of root.children || []) {
@@ -99,17 +113,13 @@ export class OrgChartComponent {
         }
         return null;
       };
-
       const originalParentInTree = findNode(newTree, originalParentNode.id);
       const newParentInTree = findNode(newTree, newParentNode.id);
-
       if (originalParentInTree?.children && newParentInTree) {
         const nodeIndex = originalParentInTree.children.findIndex(c => c.id === draggedNode.id);
         if (nodeIndex > -1) {
           const [nodeToMove] = originalParentInTree.children.splice(nodeIndex, 1);
-          if (!newParentInTree.children) {
-            newParentInTree.children = [];
-          }
+          if (!newParentInTree.children) newParentInTree.children = [];
           newParentInTree.children.push(nodeToMove);
         }
       }
@@ -126,15 +136,50 @@ export class OrgChartComponent {
 
   private canDrop(draggedNode: OrgNode, dropTarget: OrgNode): boolean {
     if (draggedNode.id === dropTarget.id) return false;
-
     const isDescendant = (parent: OrgNode, nodeId: string): boolean => {
       return parent.children?.some(child => child.id === nodeId || isDescendant(child, nodeId)) ?? false;
     };
     if (isDescendant(draggedNode, dropTarget.id)) return false;
-
     const isDraggedSubManager = !draggedNode.children?.length;
     const isTargetLevel2Manager = this.treeData().children?.some(c => c.id === dropTarget.id);
-
     return isDraggedSubManager && !!isTargetLevel2Manager;
+  }
+
+  // --- Zoom Handlers ---
+  zoomIn(): void {
+    this.zoomLevel.update(level => Math.min(level + 0.1, 1.5));
+  }
+
+  zoomOut(): void {
+    this.zoomLevel.update(level => Math.max(level - 0.1, 0.5));
+  }
+  
+  // --- Pan Handlers ---
+  onPanStart(event: MouseEvent): void {
+    // Do not start panning if the user is interacting with a button or a draggable element
+    const target = event.target as HTMLElement;
+    if (target.closest('button') || target.closest('[draggable="true"]')) {
+      return;
+    }
+    event.preventDefault();
+    this.isPanning.set(true);
+    this.panStart.set({
+      x: event.clientX - this.panOffset().x,
+      y: event.clientY - this.panOffset().y,
+    });
+  }
+
+  onPanMove(event: MouseEvent): void {
+    if (!this.isPanning()) {
+      return;
+    }
+    this.panOffset.set({
+      x: event.clientX - this.panStart().x,
+      y: event.clientY - this.panStart().y,
+    });
+  }
+
+  onPanEnd(): void {
+    this.isPanning.set(false);
   }
 }
