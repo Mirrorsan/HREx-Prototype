@@ -1,151 +1,59 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, inject, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { EmployeeService, Employee } from '../../services/employee.service';
+import { AuthService } from '../../services/auth.service';
 
-export interface OrgNode {
-  id: string;
-  name: string;
-  role: string;
-  avatar: string;
-  avatarColor: string;
-  children?: OrgNode[];
-  employees?: number;
+export interface OrgNode extends Employee {
+  children: OrgNode[];
 }
 
 @Component({
   selector: 'app-org-chart',
   templateUrl: './org-chart.component.html',
+  styleUrls: ['./org-chart.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    '(window:mousemove)': 'onPanMove($event)',
-    '(window:mouseup)': 'onPanEnd()',
-  },
+  imports: [CommonModule, RouterLink]
 })
 export class OrgChartComponent {
-  protected readonly Math = Math;
+  private employeeService = inject(EmployeeService);
+  private authService = inject(AuthService);
+  Math = Math;
+  
+  // Interaction states
+  zoomLevel = signal(1);
+  panOffset = signal({ x: 0, y: 0 });
+  isPanning = signal(false);
+  private panStart = { x: 0, y: 0 };
+  
+  // Node states
+  collapsedNodes = signal<Set<number>>(new Set());
+  expandedNodeId = signal<number | null>(null);
+  
+  // Drag & Drop states
+  draggedNode = signal<OrgNode | null>(null);
+  dropTargetNode = signal<OrgNode | null>(null);
+  canManageChart = computed(() => this.authService.hasPermission('people:org-chart:manage'));
 
-  treeData = signal<OrgNode>({
-    id: 'director-1',
-    name: 'Thomas Edison',
-    role: 'Marketing Director',
-    avatar: 'https://i.pravatar.cc/150?u=edison',
-    avatarColor: 'bg-green-200',
-    children: [
-      {
-        id: 'manager-1',
-        name: 'Marie Curie',
-        role: 'Manager',
-        avatar: 'https://i.pravatar.cc/150?u=curie',
-        avatarColor: 'bg-blue-200',
-        children: [
-          { id: 'sub-1', name: 'Will Thomson', role: 'Manager', avatar: 'https://i.pravatar.cc/150?u=thomson', avatarColor: 'bg-slate-200', employees: 3 },
-          { id: 'sub-2', name: 'Carl Gauss', role: 'Manager', avatar: 'https://i.pravatar.cc/150?u=gauss', avatarColor: 'bg-slate-200', employees: 3 },
-        ],
-      },
-      {
-        id: 'manager-2',
-        name: 'Blaise Pascal',
-        role: 'Manager',
-        avatar: 'https://i.pravatar.cc/150?u=pascal',
-        avatarColor: 'bg-blue-200',
-        children: [
-          { id: 'sub-3', name: 'James Watt', role: 'Manager', avatar: 'https://i.pravatar.cc/150?u=watt', avatarColor: 'bg-slate-200', employees: 2 },
-        ],
-      },
-      {
-        id: 'manager-3',
-        name: 'Isaac Newton',
-        role: 'Manager',
-        avatar: 'https://i.pravatar.cc/150?u=newton',
-        avatarColor: 'bg-blue-200',
-        children: [
-          { id: 'sub-4', name: 'Maxwell Clerk', role: 'Manager', avatar: 'https://i.pravatar.cc/150?u=clerk', avatarColor: 'bg-slate-200', employees: 3 },
-          { id: 'sub-5', name: 'Paul Dirac', role: 'Manager', avatar: 'https://i.pravatar.cc/150?u=dirac', avatarColor: 'bg-slate-200', employees: 2 },
-        ],
-      },
-    ],
+  private allEmployees = this.employeeService.getEmployees();
+  
+  tree = computed(() => {
+    const employees = this.allEmployees();
+    const map = new Map(employees.map(e => [e.id, { ...e, children: [] }]));
+    const roots: OrgNode[] = [];
+
+    for (const employee of employees) {
+      const node = map.get(employee.id)!;
+      if (employee.managerId === null) {
+        roots.push(node);
+      } else {
+        const manager = map.get(employee.managerId);
+        manager?.children.push(node);
+      }
+    }
+    return roots;
   });
 
-  // Drag & Drop State
-  draggedNodeInfo = signal<{ node: OrgNode; parent: OrgNode } | null>(null);
-  dropTargetId = signal<string | null>(null);
-
-  // Zoom & Pan State
-  zoomLevel = signal(1); // 1 = 100%
-  isPanning = signal(false);
-  panOffset = signal({ x: 0, y: 0 });
-  panStart = signal({ x: 0, y: 0 });
-
-
-  // --- Drag & Drop Handlers ---
-  handleDragStart(node: OrgNode, parent: OrgNode, event: DragEvent): void {
-    event.dataTransfer?.setData('text/plain', node.id);
-    this.draggedNodeInfo.set({ node, parent });
-  }
-
-  handleDragOver(event: DragEvent, parentNode: OrgNode): void {
-    event.preventDefault();
-    const dragged = this.draggedNodeInfo()?.node;
-    if (dragged && this.canDrop(dragged, parentNode)) {
-      this.dropTargetId.set(parentNode.id);
-    }
-  }
-
-  handleDragLeave(): void {
-    this.dropTargetId.set(null);
-  }
-
-  handleDrop(event: DragEvent, newParentNode: OrgNode): void {
-    event.preventDefault();
-    const info = this.draggedNodeInfo();
-    if (!info || !this.canDrop(info.node, newParentNode)) {
-      this.handleDragEnd();
-      return;
-    }
-
-    const { node: draggedNode, parent: originalParentNode } = info;
-
-    this.treeData.update(currentTree => {
-      const newTree = JSON.parse(JSON.stringify(currentTree));
-      const findNode = (root: OrgNode, nodeId: string): OrgNode | null => {
-        if (root.id === nodeId) return root;
-        for (const child of root.children || []) {
-          const found = findNode(child, nodeId);
-          if (found) return found;
-        }
-        return null;
-      };
-      const originalParentInTree = findNode(newTree, originalParentNode.id);
-      const newParentInTree = findNode(newTree, newParentNode.id);
-      if (originalParentInTree?.children && newParentInTree) {
-        const nodeIndex = originalParentInTree.children.findIndex(c => c.id === draggedNode.id);
-        if (nodeIndex > -1) {
-          const [nodeToMove] = originalParentInTree.children.splice(nodeIndex, 1);
-          if (!newParentInTree.children) newParentInTree.children = [];
-          newParentInTree.children.push(nodeToMove);
-        }
-      }
-      return newTree;
-    });
-
-    this.handleDragEnd();
-  }
-
-  handleDragEnd(): void {
-    this.draggedNodeInfo.set(null);
-    this.dropTargetId.set(null);
-  }
-
-  private canDrop(draggedNode: OrgNode, dropTarget: OrgNode): boolean {
-    if (draggedNode.id === dropTarget.id) return false;
-    const isDescendant = (parent: OrgNode, nodeId: string): boolean => {
-      return parent.children?.some(child => child.id === nodeId || isDescendant(child, nodeId)) ?? false;
-    };
-    if (isDescendant(draggedNode, dropTarget.id)) return false;
-    const isDraggedSubManager = !draggedNode.children?.length;
-    const isTargetLevel2Manager = this.treeData().children?.some(c => c.id === dropTarget.id);
-    return isDraggedSubManager && !!isTargetLevel2Manager;
-  }
-
-  // --- Zoom Handlers ---
   zoomIn(): void {
     this.zoomLevel.update(level => Math.min(level + 0.1, 1.5));
   }
@@ -154,32 +62,104 @@ export class OrgChartComponent {
     this.zoomLevel.update(level => Math.max(level - 0.1, 0.5));
   }
   
-  // --- Pan Handlers ---
+  centerView(): void {
+      this.zoomLevel.set(1);
+      this.panOffset.set({ x: 0, y: 0 });
+  }
+
   onPanStart(event: MouseEvent): void {
-    // Do not start panning if the user is interacting with a button or a draggable element
     const target = event.target as HTMLElement;
-    if (target.closest('button') || target.closest('[draggable="true"]')) {
+    // Prevent panning when clicking on interactive elements
+    if (target.closest('button, a, [draggable="true"]')) {
       return;
     }
     event.preventDefault();
     this.isPanning.set(true);
-    this.panStart.set({
-      x: event.clientX - this.panOffset().x,
-      y: event.clientY - this.panOffset().y,
-    });
+    this.panStart.x = event.clientX - this.panOffset().x;
+    this.panStart.y = event.clientY - this.panOffset().y;
   }
 
+  @HostListener('window:mousemove', ['$event'])
   onPanMove(event: MouseEvent): void {
-    if (!this.isPanning()) {
-      return;
-    }
+    if (!this.isPanning()) return;
     this.panOffset.set({
-      x: event.clientX - this.panStart().x,
-      y: event.clientY - this.panStart().y,
+      x: event.clientX - this.panStart.x,
+      y: event.clientY - this.panStart.y,
     });
   }
 
+  @HostListener('window:mouseup')
   onPanEnd(): void {
     this.isPanning.set(false);
+  }
+  
+  toggleCollapse(nodeId: number): void {
+    this.collapsedNodes.update(currentSet => {
+      const newSet = new Set(currentSet);
+      if (newSet.has(nodeId)) {
+        newSet.delete(nodeId);
+      } else {
+        newSet.add(nodeId);
+      }
+      return newSet;
+    });
+  }
+
+  setExpandedNode(nodeId: number | null): void {
+    this.expandedNodeId.set(nodeId);
+  }
+  
+  // Drag and Drop Handlers
+  handleDragStart(event: DragEvent, node: OrgNode): void {
+    if (!this.canManageChart()) return;
+    event.dataTransfer!.setData('text/plain', node.id.toString());
+    event.dataTransfer!.effectAllowed = 'move';
+    this.draggedNode.set(node);
+  }
+
+  handleDragOver(event: DragEvent, potentialTarget: OrgNode): void {
+    if (!this.canManageChart() || !this.draggedNode()) return;
+    
+    // Prevent dropping on itself or its own children
+    if (this.draggedNode()!.id === potentialTarget.id || this.isDescendant(this.draggedNode()!, potentialTarget.id)) {
+        this.dropTargetNode.set(null);
+        return;
+    }
+    
+    event.preventDefault();
+    this.dropTargetNode.set(potentialTarget);
+  }
+  
+  private isDescendant(node: OrgNode, potentialChildId: number): boolean {
+    if (node.id === potentialChildId) return true;
+    for (const child of node.children) {
+      if (this.isDescendant(child, potentialChildId)) return true;
+    }
+    return false;
+  }
+
+  handleDragLeave(): void {
+    this.dropTargetNode.set(null);
+  }
+
+  handleDrop(event: DragEvent, newManager: OrgNode): void {
+    if (!this.canManageChart() || !this.draggedNode() || !this.dropTargetNode()) return;
+    event.preventDefault();
+    const draggedNodeId = this.draggedNode()!.id;
+    const newManagerId = newManager.id;
+    
+    if (draggedNodeId !== newManagerId) {
+      this.employeeService.updateManager(draggedNodeId, newManagerId);
+    }
+    this.cleanupDragState();
+  }
+
+  handleDragEnd(): void {
+    this.cleanupDragState();
+  }
+  
+  private cleanupDragState(): void {
+    this.draggedNode.set(null);
+    this.dropTargetNode.set(null);
   }
 }

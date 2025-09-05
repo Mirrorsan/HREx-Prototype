@@ -1,0 +1,77 @@
+/* Styles for the tree structure and connector lines */
+.org-tree {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.org-tree ul {
+  display: flex;
+  justify-content: center;
+  list-style-type: none;
+  padding: 0;
+  position: relative;
+  margin-top: 50px; /* Space for connector lines */
+}
+
+.org-tree li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 0 1rem; /* Spacing between siblings */
+}
+
+/* Horizontal line connecting siblings */
+.org-tree li::before, .org-tree li::after {
+  content: '';
+  position: absolute;
+  top: -25px; /* Half of margin-top */
+  height: 2px;
+  background-color: #cbd5e1; /* slate-300 */
+  width: 50%;
+}
+
+.org-tree li::before {
+  left: 0;
+}
+
+.org-tree li::after {
+  right: 0;
+}
+
+/* Remove line for single child */
+.org-tree li:only-child::before, .org-tree li:only-child::after {
+  display: none;
+}
+
+/* Remove line for first and last child to create T-junctions */
+.org-tree li:first-child::before, .org-tree li:last-child::after {
+  display: none;
+}
+
+.node-content {
+  position: relative;
+  padding-top: 25px; /* Half of margin-top */
+}
+
+/* Vertical line coming down from parent */
+.node-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 25px; /* Half of margin-top */
+  width: 2px;
+  background-color: #cbd5e1; /* slate-300 */
+}
+
+/* Hide vertical line for root node */
+.org-tree > li > .node-content::before {
+  display: none;
+}
+
+.node-card {
+  border: 2px solid transparent;
+}

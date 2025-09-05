@@ -31,8 +31,33 @@
           <span class="sr-only">View notifications</span>
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
         </button>
-        <div class="w-8 h-8 rounded-full overflow-hidden">
-            <img class="w-full h-full object-cover" src="https://picsum.photos/id/237/100/100" alt="User avatar">
+        <div class="relative">
+          <button (click)="toggleUserMenu()" class="w-8 h-8 rounded-full overflow-hidden block">
+            <img class="w-full h-full object-cover" [src]="authService.currentUser()?.avatar" alt="User avatar">
+          </button>
+
+          @if (showUserMenu()) {
+            <div class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-20">
+              <div class="px-4 py-2 border-b border-slate-200">
+                <p class="text-sm font-semibold text-slate-800">{{ authService.currentUser()?.name }}</p>
+                <p class="text-xs text-slate-500">
+                  Logged in as: <span class="font-medium text-slate-600">{{ authService.currentUser()?.role }}</span>
+                </p>
+              </div>
+              <div class="px-4 py-3">
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Switch Role (Sim)</p>
+                <div class="mt-2 grid grid-cols-2 gap-2">
+                  @for(role of roles; track role) {
+                    <button (click)="switchRole(role)" 
+                      class="px-2 py-1.5 text-sm rounded-md text-left"
+                      [class]="authService.currentUser()?.role === role ? 'bg-slate-800 text-white' : 'hover:bg-slate-100 text-slate-700'">
+                      {{ role }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
         </div>
       </div>
     </div>

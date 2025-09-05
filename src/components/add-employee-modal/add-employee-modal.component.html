@@ -1,0 +1,78 @@
+<div class="fixed inset-0 bg-black/30 z-40" (click)="onCancel()"></div>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="relative bg-white rounded-lg shadow-xl w-full max-w-lg">
+    <div class="p-6 border-b">
+      <h3 class="text-xl font-semibold text-slate-800">Add New Employee</h3>
+      <p class="text-sm text-slate-500 mt-1">Enter the details for the new team member.</p>
+    </div>
+    <form [formGroup]="addEmployeeForm" (ngSubmit)="onSubmit()">
+      <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="name" class="block text-sm font-medium text-slate-700">Full Name</label>
+            <input type="text" id="name" formControlName="name" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
+          </div>
+          <div>
+            <label for="nickname" class="block text-sm font-medium text-slate-700">Nickname</label>
+            <input type="text" id="nickname" formControlName="nickname" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
+          </div>
+        </div>
+        <div>
+            <label for="email" class="block text-sm font-medium text-slate-700">Email Address</label>
+            <input type="email" id="email" formControlName="email" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
+        </div>
+        <div>
+          <label for="jobTitle" class="block text-sm font-medium text-slate-700">Job Title</label>
+          <input type="text" id="jobTitle" formControlName="jobTitle" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+           <div>
+            <label for="department" class="block text-sm font-medium text-slate-700">Department</label>
+            <select id="department" formControlName="department" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
+              <option>Product</option>
+              <option>Engineering</option>
+              <option>Operations</option>
+              <option>Sales</option>
+            </select>
+          </div>
+           <div>
+            <label for="site" class="block text-sm font-medium text-slate-700">Site</label>
+            <select id="site" formControlName="site" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
+              <option>Stockholm</option>
+              <option>Miami</option>
+              <option>Kyiv</option>
+              <option>Ottawa</option>
+              <option>Sao Paulo</option>
+              <option>London</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="salary" class="block text-sm font-medium text-slate-700">Salary (USD)</label>
+            <input type="number" id="salary" formControlName="salary" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
+          </div>
+          <div>
+            <label for="startDate" class="block text-sm font-medium text-slate-700">Start Date</label>
+            <input type="date" id="startDate" formControlName="startDate" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
+          </div>
+        </div>
+        <div>
+          <label for="status" class="block text-sm font-medium text-slate-700">Status</label>
+          <select id="status" formControlName="status" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
+            <option>Active</option>
+            <option>Invited</option>
+          </select>
+        </div>
+      </div>
+      <div class="p-6 bg-slate-50 rounded-b-lg flex justify-end items-center space-x-3">
+        <button type="button" (click)="onCancel()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
+          Cancel
+        </button>
+        <button type="submit" [disabled]="!addEmployeeForm.valid" class="px-4 py-2 text-sm font-medium text-white bg-slate-800 border border-transparent rounded-md shadow-sm hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-800 disabled:opacity-50 disabled:cursor-not-allowed">
+          Save Employee
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
