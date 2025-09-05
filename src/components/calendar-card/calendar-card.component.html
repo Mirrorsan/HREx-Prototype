@@ -1,0 +1,47 @@
+<div class="bg-white rounded-xl shadow-sm p-6">
+  <div class="flex justify-between items-center mb-6">
+    <div class="flex items-center space-x-4">
+      <button class="text-slate-500 hover:text-slate-800 p-1 rounded-full hover:bg-slate-100">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+      </button>
+      <h3 class="text-lg font-bold text-slate-800">September 2024</h3>
+      <button class="text-slate-500 hover:text-slate-800 p-1 rounded-full hover:bg-slate-100">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+      </button>
+    </div>
+    <div class="flex items-center space-x-2">
+        <span class="text-slate-400">August</span>
+        <span class="text-slate-400">October</span>
+    </div>
+  </div>
+  
+  <div class="grid grid-cols-6 gap-4 text-center">
+    @for(day of days(); track day.date) {
+      <div class="p-2 rounded-lg cursor-pointer transition-colors" [class]="day.isToday ? 'bg-slate-800 text-white' : 'hover:bg-slate-100'">
+        <p class="text-sm">{{ day.name }}</p>
+        <p class="font-bold text-lg">{{ day.date }}</p>
+      </div>
+    }
+  </div>
+
+  <div class="mt-6 space-y-4">
+    @for(event of events(); track event.title) {
+      <div class="bg-slate-50 p-4 rounded-lg flex items-start space-x-4">
+        <div class="text-sm font-semibold text-slate-500 w-20 text-right">{{ event.time }}</div>
+        <div class="flex-1">
+          <p class="font-bold text-slate-800">{{ event.title }}</p>
+          <p class="text-sm text-slate-500">{{ event.description }}</p>
+          <div class="flex -space-x-2 mt-2">
+            @for(attendee of event.attendees; track attendee) {
+              <img class="inline-block h-6 w-6 rounded-full ring-2 ring-slate-50" [src]="attendee" alt="attendee">
+            }
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="text-center text-slate-500 py-8">
+        <p>No events scheduled.</p>
+      </div>
+    }
+  </div>
+</div>

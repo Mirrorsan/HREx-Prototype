@@ -1,0 +1,5 @@
+{
+  "name": "HREx Dashboard",
+  "description": "A modern HR platform delivering a dashboard-centric experience for HR, Managers, and Employees, surfacing key KPIs, time tracking, onboarding tasks, and calendar events at a glance.",
+  "requestFramePermissions": []
+}
