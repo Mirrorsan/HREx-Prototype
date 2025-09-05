@@ -1,177 +1,154 @@
-<div class="p-4 sm:p-6 lg:p-8 h-full flex flex-col">
-  <!-- Page Header -->
-  <header class="flex-shrink-0">
-    <h1 class="text-3xl font-bold text-slate-800">People</h1>
-
-    <!-- Tabs -->
-    <div class="mt-4 border-b border-slate-200">
-      <nav class="-mb-px flex space-x-6" aria-label="Tabs">
-        <button (click)="setView('list')"
-                [class]="activeView() === 'list' ? 'border-slate-800 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
-                class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors">
+<div class="p-4 sm:p-6 lg:p-8 space-y-6">
+  <!-- Control Panel Card -->
+  <div class="bg-white rounded-xl shadow-sm p-6">
+    <!-- Top section: Title and Tabs -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <h1 class="text-2xl font-bold text-slate-800">People</h1>
+      <!-- Tabs -->
+      <div class="mt-4 sm:mt-0 flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
+        <button 
+          (click)="setView('list')" 
+          class="px-4 py-1.5 text-sm font-semibold rounded-md transition-colors"
+          [class]="activeView() === 'list' ? 'bg-white text-slate-800 shadow-sm' : 'bg-transparent text-slate-600 hover:text-slate-800'">
           Directory
         </button>
-        <button (click)="setView('orgChart')"
-                [class]="activeView() === 'orgChart' ? 'border-slate-800 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
-                class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors">
+        <button 
+          (click)="setView('orgChart')" 
+          class="px-4 py-1.5 text-sm font-semibold rounded-md transition-colors"
+          [class]="activeView() === 'orgChart' ? 'bg-white text-slate-800 shadow-sm' : 'bg-transparent text-slate-600 hover:text-slate-800'">
           Org Chart
         </button>
-      </nav>
+      </div>
     </div>
-  </header>
 
-  <!-- Main Content -->
-  <div class="mt-6 flex-grow flex flex-col min-h-0">
-    @if (activeView() === 'list') {
-      <!-- Directory View -->
-      <div class="flex flex-col h-full">
-        <!-- Controls -->
-        <div class="flex-shrink-0 flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
-          <div class="w-full sm:w-auto sm:max-w-xs">
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              <input type="text" (input)="onSearch($event)" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-slate-500 focus:border-slate-500 sm:text-sm">
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            @if (canAddEmployee()) {
-              <button (click)="openAddEmployeeModal()" class="h-9 px-4 py-2 text-sm font-medium text-white bg-slate-800 border border-transparent rounded-md shadow-sm hover:bg-slate-700 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
-                Add Employee
-              </button>
-            }
-            @if (canExportList()) {
-              <button class="h-9 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 flex items-center gap-2">
-                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                Export
-              </button>
-            }
-          </div>
-        </div>
+    <!-- Divider -->
+    <div class="border-t border-slate-200 my-4"></div>
 
-        <!-- Table -->
-        <div class="flex-grow overflow-y-auto">
-          <div class="inline-block min-w-full align-middle">
-            <table class="min-w-full divide-y divide-slate-200">
-              <thead class="bg-slate-50 sticky top-0">
-                <tr>
-                  <th scope="col" class="relative px-6 py-3 text-left">
-                    <input type="checkbox" class="h-4 w-4 text-slate-600 border-slate-300 rounded" (change)="toggleAllSelection($event)">
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Name</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Nickname</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Job title</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Department</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Site</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Salary</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Start date</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
-                  @if(canManageEmployees()) {
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
-                  }
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-slate-200">
-                @for (employee of filteredEmployees(); track employee.id; let i = $index) {
-                  <tr class="hover:bg-slate-50 animate-row" [style.animation-delay.ms]="i * 30">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <input type="checkbox" class="h-4 w-4 text-slate-600 border-slate-300 rounded" [checked]="employee.selected" (change)="toggleSelection(employee.id)">
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="flex-shrink-0 h-10 w-10">
-                          <img class="h-10 w-10 rounded-full object-cover" [src]="employee.avatar" alt="">
-                        </div>
-                        <div class="ml-4">
-                          <div class="text-sm font-medium text-slate-900">{{ employee.name }}</div>
-                          <div class="text-sm text-slate-500">{{ employee.email }}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ employee.nickname }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ employee.jobTitle }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ employee.department }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ employee.siteEmoji }} {{ employee.site }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ employee.salary }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ employee.startDate | date }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      @if (employee.status === 'Active') {
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                      } @else if (employee.status === 'On Leave') {
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">On Leave</span>
-                      } @else if (employee.status === 'Invited') {
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Invited</span>
-                      }
-                    </td>
-                    @if(canManageEmployees()) {
-                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div class="relative">
-                          <button (click)="toggleActionMenu(employee.id)" class="p-2 rounded-full hover:bg-slate-200 text-slate-500">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                          </button>
-                          @if (activeActionMenu() === employee.id) {
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-10">
-                              @if(canEditEmployee()) {
-                                <button (click)="editEmployee(employee)" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">Edit</button>
-                              }
-                              @if(canDeleteEmployee()) {
-                                <button (click)="deleteEmployee(employee.id)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Delete</button>
-                              }
-                              @if(canEditStatus()) {
-                                <div class="border-t border-slate-100 my-1"></div>
-                                @for(status of availableStatuses; track status) {
-                                  @if(status !== employee.status) {
-                                    <button (click)="changeStatus(employee.id, status)" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">Set as {{status}}</button>
-                                  }
-                                }
-                              }
-                            </div>
-                          }
-                        </div>
-                      </td>
-                    }
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+    <!-- Bottom section: Search and Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <!-- Search Bar -->
+      <div class="relative flex-grow">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </div>
+        <input 
+          type="text" 
+          placeholder="Search for an employee..."
+          (input)="onSearch($event)"
+          class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-slate-500 focus:border-slate-500 sm:text-sm"
+        >
       </div>
-    } @else if (activeView() === 'orgChart') {
-      <!-- Org Chart View -->
-      <div class="flex-grow flex flex-col min-h-0">
-          <div class="flex-shrink-0 flex items-center justify-between gap-4 mb-4">
-            <div class="relative w-full max-w-xs">
-               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
-              </div>
-              <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-slate-500 focus:border-slate-500 sm:text-sm">
-            </div>
-            <div class="flex items-center gap-2">
-                @if (canAddEmployee()) {
-                <button (click)="openAddEmployeeModal()" class="h-9 px-4 py-2 text-sm font-medium text-white bg-slate-800 border border-transparent rounded-md shadow-sm hover:bg-slate-700 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
-                    Add Employee
-                </button>
-                }
-                @if (canExportList()) {
-                <button class="h-9 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Export
-                </button>
-                }
-            </div>
-          </div>
-          <div class="flex-grow min-h-0">
-             <app-org-chart></app-org-chart>
-          </div>
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-2 shrink-0">
+        @if (canAddEmployee()) {
+          <button (click)="openAddEmployeeModal()" class="h-9 px-4 py-2 flex items-center gap-2 text-sm font-medium text-white bg-slate-800 border border-transparent rounded-md shadow-sm hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-800">
+             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Add Employee
+          </button>
+        }
+        @if (canExportList()) {
+          <button class="h-9 px-4 py-2 flex items-center gap-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
+             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            Export
+          </button>
+        }
       </div>
-    }
+    </div>
   </div>
+
+  <!-- Content Area -->
+  @if (activeView() === 'list') {
+    <!-- Directory List Card -->
+    <div class="bg-white rounded-xl shadow-sm overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+          <tr>
+            <th scope="col" class="p-4">
+              <input (change)="toggleAllSelection($event)" type="checkbox" class="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500">
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Name</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Nickname</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Job title</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Departament</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Site</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Salary</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Start date</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            @if(canManageEmployees()) {
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+            }
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-slate-200">
+          @for (employee of filteredEmployees(); track employee.id; let i = $index) {
+            <tr class="hover:bg-slate-50 animate-row" [style.animation-delay]="i * 30 + 'ms'">
+              <td class="p-4">
+                <input type="checkbox" [checked]="employee.selected" (change)="toggleSelection(employee.id)" class="h-4 w-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500">
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <img class="h-10 w-10 rounded-full object-cover" [src]="employee.avatar" alt="">
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-slate-900">{{ employee.name }}</div>
+                    <div class="text-sm text-slate-500">{{ employee.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ employee.nickname }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 font-medium">{{ employee.jobTitle }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ employee.department }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ employee.siteEmoji }} {{ employee.site }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ employee.salary }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ employee.startDate | date }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                @if (employee.status === 'Active') {
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                } @else if (employee.status === 'On Leave') {
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">On Leave</span>
+                } @else {
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Invited</span>
+                }
+              </td>
+              @if(canManageEmployees()) {
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium relative">
+                  <button (click)="toggleActionMenu(employee.id)" class="text-slate-500 hover:text-slate-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                  </button>
+                  @if (activeActionMenu() === employee.id) {
+                    <div class="absolute right-8 top-0 z-10 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                      <div class="py-1">
+                        @if(canEditEmployee()){
+                          <a href="javascript:void(0)" (click)="editEmployee(employee)" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">Edit Employee</a>
+                        }
+                        @if(canDeleteEmployee()){
+                          <a href="javascript:void(0)" (click)="deleteEmployee(employee.id)" class="block px-4 py-2 text-sm text-red-600 hover:bg-slate-100">Delete Employee</a>
+                        }
+                        @if(canEditStatus()){
+                          <div class="border-t border-slate-100 my-1"></div>
+                          @for(status of availableStatuses; track status) {
+                            @if(status !== employee.status) {
+                                <a href="javascript:void(0)" (click)="changeStatus(employee.id, status)" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">Set as {{ status }}</a>
+                            }
+                          }
+                        }
+                      </div>
+                    </div>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <!-- Org Chart container -->
+    <div class="h-[calc(100vh-250px)]">
+      <app-org-chart></app-org-chart>
+    </div>
+  }
 </div>
 
 @if (showAddEmployeeModal()) {
