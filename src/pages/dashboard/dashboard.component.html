@@ -1,27 +1,56 @@
 <div class="p-4 sm:p-6 lg:p-8">
-  <app-welcome-banner></app-welcome-banner>
-
-  <!-- Main dashboard grid -->
-  <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-
-    <!-- Left Column -->
-    <div class="lg:col-span-1 xl:col-span-1 space-y-6">
-      <app-profile-card></app-profile-card>
+  <!-- Admin & HR Dashboard -->
+  @if (userRole() === 'Admin' || userRole() === 'HR') {
+    <app-welcome-banner [userName]="currentUser()?.name" [userRole]="userRole()"></app-welcome-banner>
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div class="lg:col-span-1 xl:col-span-1 space-y-6">
+        <app-profile-card></app-profile-card>
+      </div>
+      <div class="lg:col-span-2 xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="md:col-span-2">
+          <app-calendar-card></app-calendar-card>
+        </div>
+        <app-progress-card></app-progress-card>
+        <app-time-tracker-card></app-time-tracker-card>
+      </div>
+      <div class="lg:col-span-3 xl:col-span-1 space-y-6">
+        <app-onboarding-card></app-onboarding-card>
+      </div>
     </div>
-
-    <!-- Center Column -->
-    <div class="lg:col-span-2 xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="md:col-span-2">
+  }
+  <!-- Manager Dashboard -->
+  @else if (userRole() === 'Manager') {
+    <app-welcome-banner [userName]="currentUser()?.name" [userRole]="userRole()"></app-welcome-banner>
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div class="lg:col-span-1 xl:col-span-1 space-y-6">
+        <app-profile-card></app-profile-card>
+        <app-approvals-card></app-approvals-card>
+      </div>
+      <div class="lg:col-span-2 xl:col-span-2 space-y-6">
+        <app-team-overview-card></app-team-overview-card>
         <app-calendar-card></app-calendar-card>
       </div>
-      <app-progress-card></app-progress-card>
-      <app-time-tracker-card></app-time-tracker-card>
+      <div class="lg:col-span-3 xl:col-span-1 space-y-6">
+        <app-time-tracker-card></app-time-tracker-card>
+        <app-onboarding-card></app-onboarding-card>
+      </div>
     </div>
-
-    <!-- Right Column -->
-    <div class="lg:col-span-3 xl:col-span-1 space-y-6">
-       <app-onboarding-card></app-onboarding-card>
+  }
+  <!-- Employee Dashboard -->
+  @else if (userRole() === 'Employee') {
+    <app-welcome-banner [userName]="currentUser()?.name" [userRole]="userRole()"></app-welcome-banner>
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div class="lg:col-span-1 xl:col-span-1 space-y-6">
+        <app-profile-card></app-profile-card>
+        <app-onboarding-card></app-onboarding-card>
+      </div>
+      <div class="lg:col-span-2 xl:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <app-progress-card></app-progress-card>
+        <app-time-tracker-card></app-time-tracker-card>
+         <div class="md:col-span-2">
+          <app-calendar-card></app-calendar-card>
+        </div>
+      </div>
     </div>
-
-  </div>
+  }
 </div>

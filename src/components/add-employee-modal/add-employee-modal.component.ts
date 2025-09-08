@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, output, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+// FIX: Import FormGroup and FormControl, and remove FormBuilder.
+import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EmployeeService, NewEmployee } from '../../services/employee.service';
 import { CommonModule } from '@angular/common';
 
@@ -77,7 +78,6 @@ import { CommonModule } from '@angular/common';
   imports: [ReactiveFormsModule, CommonModule],
 })
 export class AddEmployeeModalComponent {
-  private fb = inject(FormBuilder);
   private employeeService = inject(EmployeeService);
   
   close = output<void>();
@@ -85,18 +85,19 @@ export class AddEmployeeModalComponent {
   
   managers = this.employeeService.getEmployees();
 
-  addEmployeeForm = this.fb.group({
-    name: ['', Validators.required],
-    nickname: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
-    jobTitle: ['', Validators.required],
-    department: ['', Validators.required],
-    site: ['', Validators.required],
-    managerId: [null as number | null],
-    startDate: ['', Validators.required],
-    citizenId: [''],
-    taxId: [''],
-    dateOfBirth: [''],
+  // FIX: Use new FormGroup and new FormControl instead of FormBuilder to avoid injection issues.
+  addEmployeeForm = new FormGroup({
+    name: new FormControl('', Validators.required),
+    nickname: new FormControl('', Validators.required),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    jobTitle: new FormControl('', Validators.required),
+    department: new FormControl('', Validators.required),
+    site: new FormControl('', Validators.required),
+    managerId: new FormControl(null as number | null),
+    startDate: new FormControl('', Validators.required),
+    citizenId: new FormControl(''),
+    taxId: new FormControl(''),
+    dateOfBirth: new FormControl(''),
   });
 
   onSubmit(): void {

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService, Role } from '../../services/auth.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -11,8 +11,6 @@ import { AuthService, Role } from '../../services/auth.service';
 export class HeaderComponent {
   authService = inject(AuthService);
   showUserMenu = signal(false);
-
-  readonly roles: Role[] = ['Admin', 'HR', 'Manager', 'Employee'];
 
   navItems = signal([
     { name: 'Dashboard', path: '/dashboard', disabled: false },
@@ -29,8 +27,8 @@ export class HeaderComponent {
     this.showUserMenu.update(v => !v);
   }
 
-  switchRole(role: Role): void {
-    this.authService.login(role);
+  logout(): void {
+    this.authService.logout();
     this.showUserMenu.set(false);
   }
 }

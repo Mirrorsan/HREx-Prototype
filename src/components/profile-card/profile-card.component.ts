@@ -1,4 +1,6 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, computed } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import { EmployeeService } from '../../services/employee.service';
 
 interface AccordionItem {
   id: string;
@@ -14,6 +16,19 @@ interface AccordionItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileCardComponent {
+  private authService = inject(AuthService);
+  private employeeService = inject(EmployeeService);
+
+  private currentUser = this.authService.currentUser;
+
+  employee = computed(() => {
+    const user = this.currentUser();
+    if (!user) {
+      return null;
+    }
+    return this.employeeService.getEmployee(user.id)();
+  });
+
   accordionItems = signal<AccordionItem[]>([
     { id: 'pension', title: 'Pension contributions', content: ['Standard Plan - 5% Match'], icon: 'credit-card', expanded: false },
     { id: 'devices', title: 'Devices', content: ['MacBook Air M1', 'iPhone 15 Pro'], icon: 'desktop-computer', expanded: true },

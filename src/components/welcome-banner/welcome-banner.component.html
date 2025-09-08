@@ -1,32 +1,48 @@
 <div class="bg-white rounded-xl shadow-sm p-6">
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-    <h2 class="text-2xl font-bold text-slate-800">Welcome in, Nixtio</h2>
-    <div class="flex items-center space-x-2 mt-4 sm:mt-0 text-sm">
-      <div class="font-semibold">
-        <span class="text-slate-500">Employe:</span>
-        <span class="text-slate-900 ml-1">78</span>
-      </div>
-      <div class="font-semibold">
-        <span class="text-slate-500">Hirings:</span>
-        <span class="text-slate-900 ml-1">56</span>
-      </div>
-      <div class="font-semibold">
-        <span class="text-slate-500">Projects:</span>
-        <span class="text-slate-900 ml-1">203</span>
-      </div>
-    </div>
-  </div>
-  <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-    @for(kpi of kpis(); track kpi.name) {
-      <div>
-        <div class="flex justify-between items-center text-sm text-slate-500 mb-1">
-          <span>{{ kpi.name }}</span>
-          <span>{{ kpi.value }}</span>
+    <h2 class="text-2xl font-bold text-slate-800">Welcome in, {{ userName() }}</h2>
+    
+    @if (userRole() === 'Admin' || userRole() === 'HR') {
+      <div class="flex items-center space-x-2 mt-4 sm:mt-0 text-sm">
+        <div class="font-semibold">
+          <span class="text-slate-500">Employe:</span>
+          <span class="text-slate-900 ml-1">78</span>
         </div>
-        <div class="w-full bg-slate-200 rounded-full h-2">
-          <div [class]="kpi.color" class="h-2 rounded-full" [style.width]="kpi.value"></div>
+        <div class="font-semibold">
+          <span class="text-slate-500">Hirings:</span>
+          <span class="text-slate-900 ml-1">56</span>
+        </div>
+        <div class="font-semibold">
+          <span class="text-slate-500">Projects:</span>
+          <span class="text-slate-900 ml-1">203</span>
+        </div>
+      </div>
+    } @else if (userRole() === 'Manager') {
+       <div class="flex items-center space-x-2 mt-4 sm:mt-0 text-sm">
+        <div class="font-semibold">
+          <span class="text-slate-500">Team Size:</span>
+          <span class="text-slate-900 ml-1">{{ teamMembers().length }}</span>
+        </div>
+        <div class="font-semibold">
+          <span class="text-slate-500">On Leave:</span>
+          <span class="text-slate-900 ml-1">{{ teamMembersOnLeaveCount() }}</span>
         </div>
       </div>
     }
   </div>
+  @if (userRole() === 'Admin' || userRole() === 'HR') {
+    <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+      @for(kpi of kpis(); track kpi.name) {
+        <div>
+          <div class="flex justify-between items-center text-sm text-slate-500 mb-1">
+            <span>{{ kpi.name }}</span>
+            <span>{{ kpi.value }}</span>
+          </div>
+          <div class="w-full bg-slate-200 rounded-full h-2">
+            <div [class]="kpi.color" class="h-2 rounded-full" [style.width]="kpi.value"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
 </div>

@@ -1,8 +1,11 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { EmployeeService } from './employee.service';
 
 export type Role = 'Admin' | 'HR' | 'Manager' | 'Employee';
 
 export interface User {
+  id: number;
   name: string;
   role: Role;
   avatar: string;
@@ -48,15 +51,41 @@ const PERMISSIONS: Record<Role, string[]> = {
   providedIn: 'root',
 })
 export class AuthService {
+  private router = inject(Router);
+  private employeeService = inject(EmployeeService);
   currentUser = signal<User | null>(null);
 
   constructor() {
-    // Set a default user for initial load, let's say HR.
-    this.login('HR');
+    // No default user on startup
   }
 
   login(role: Role): void {
+    const employee = this.employeeService.getEmployee(1)();
+    if (!employee) {
+        console.error("Login failed: Employee with ID 1 not found.");
+        return;
+    }
+    
+    let jobTitle = employee.jobTitle;
+    switch (role) {
+      case 'Admin':
+        jobTitle = 'System Administrator';
+        break;
+      case 'HR':
+        jobTitle = 'HR Manager';
+        break;
+      case 'Manager':
+        jobTitle = 'Team Manager';
+        break;
+      case 'Employee':
+        jobTitle = 'UX/UI Designer';
+        break;
+    }
+
+    this.employeeService.updateEmployee({ ...employee, jobTitle });
+
     const user: User = {
+      id: 1, // Lora Piterson's ID
       name: 'Lora Piterson', // Using the name from the profile card
       role,
       avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=200&auto=format&fit=crop',
@@ -66,6 +95,7 @@ export class AuthService {
 
   logout(): void {
     this.currentUser.set(null);
+    this.router.navigate(['/login']);
   }
 
   hasPermission(permission: string): boolean {

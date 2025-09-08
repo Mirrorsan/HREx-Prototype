@@ -1,75 +1,85 @@
-/* Styles for the tree structure and connector lines */
+/* Use a more robust table-like layout for the tree */
 .org-tree {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
+  white-space: nowrap;
+  margin: 0 auto;
+  text-align: center;
+  display: inline-block;
 }
 
 .org-tree ul {
-  display: flex;
-  justify-content: center;
-  list-style-type: none;
-  padding: 0;
+  padding-top: 20px;
   position: relative;
-  margin-top: 50px; /* Space for connector lines */
+  transition: all 0.5s;
 }
 
 .org-tree li {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  list-style-type: none;
   position: relative;
-  padding: 0 1rem; /* Spacing between siblings */
+  padding: 20px 8px 0 8px;
+  transition: all 0.5s;
 }
 
-/* Horizontal line connecting siblings */
+/* Remove top padding for single children to avoid large gaps */
+.org-tree li:only-child {
+  padding-top: 0;
+}
+
+/* Connector lines: vertical line down from parent */
 .org-tree li::before, .org-tree li::after {
   content: '';
   position: absolute;
-  top: -25px; /* Half of margin-top */
-  height: 2px;
-  background-color: #cbd5e1; /* slate-300 */
+  top: 0;
+  right: 50%;
+  border-top: 2px solid #cbd5e1; /* slate-300 */
   width: 50%;
+  height: 20px;
 }
-
-.org-tree li::before {
-  left: 0;
-}
-
+/* Connector lines: horizontal line */
 .org-tree li::after {
-  right: 0;
+  right: auto;
+  left: 50%;
+  border-left: 2px solid #cbd5e1; /* slate-300 */
 }
 
-/* Remove line for single child */
-.org-tree li:only-child::before, .org-tree li:only-child::after {
+/* Remove dangling connectors */
+.org-tree li:only-child::after, .org-tree li:only-child::before {
   display: none;
 }
-
-/* Remove line for first and last child to create T-junctions */
 .org-tree li:first-child::before, .org-tree li:last-child::after {
+  border: 0 none;
+}
+
+/* T-junctions for last child */
+.org-tree li:last-child::before {
+  border-right: 2px solid #cbd5e1; /* slate-300 */
+  border-radius: 0 5px 0 0;
+}
+/* T-junctions for first child */
+.org-tree li:first-child::after {
+  border-radius: 5px 0 0 0;
+}
+
+/* The root node doesn't need a connector line above it */
+.org-tree > ul > li::before, .org-tree > ul > li::after {
   display: none;
 }
 
-.node-content {
-  position: relative;
-  padding-top: 25px; /* Half of margin-top */
-}
-
-/* Vertical line coming down from parent */
-.node-content::before {
+/* Vertical line coming from the parent's horizontal connector */
+.org-tree ul ul::before {
   content: '';
   position: absolute;
   top: 0;
   left: 50%;
-  transform: translateX(-50%);
-  height: 25px; /* Half of margin-top */
-  width: 2px;
-  background-color: #cbd5e1; /* slate-300 */
+  border-left: 2px solid #cbd5e1; /* slate-300 */
+  width: 0;
+  height: 20px;
 }
 
-/* Hide vertical line for root node */
-.org-tree > li > .node-content::before {
-  display: none;
+.node-content {
+  position: relative;
 }
 
 .node-card {

@@ -1,0 +1,31 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-b from-sky-100 via-yellow-50 to-orange-100">
+  <div class="w-full max-w-md p-8 space-y-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
+    <div>
+      <h1 class="text-4xl font-bold text-center text-slate-800">HREx</h1>
+      <p class="mt-2 text-center text-sm text-slate-600">
+        Welcome! Please select your role to continue.
+      </p>
+    </div>
+    <div class="space-y-4">
+      <p class="text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Select a Role to Login</p>
+      <div class="grid grid-cols-2 gap-4">
+        @for (role of roles; track role) {
+          <button (click)="loginAs(role)" class="flex flex-col items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+            <span class="text-5xl mb-2">
+              @if (role === 'Admin') { 
+                <span>👑</span> 
+              } @else if (role === 'HR') { 
+                <span>📋</span> 
+              } @else if (role === 'Manager') { 
+                <span>🧑‍💼</span> 
+              } @else if (role === 'Employee') { 
+                <span>🧑‍💻</span> 
+              }
+            </span>
+            <span class="text-lg font-semibold text-slate-700">{{ role }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>

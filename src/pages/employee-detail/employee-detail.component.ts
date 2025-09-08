@@ -1,7 +1,8 @@
 import { Component, ChangeDetectionStrategy, inject, signal, effect } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DatePipe, CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+// FIX: Import FormGroup and FormControl, and remove FormBuilder.
+import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EmployeeService, Employee } from '../../services/employee.service';
 import { AuthService } from '../../services/auth.service';
 import { computed } from '@angular/core';
@@ -17,7 +18,6 @@ export class EmployeeDetailComponent {
   private router = inject(Router);
   private employeeService = inject(EmployeeService);
   private authService = inject(AuthService);
-  private fb = inject(FormBuilder);
 
   private employeeId = signal<number | null>(null);
   
@@ -31,19 +31,20 @@ export class EmployeeDetailComponent {
   
   canEdit = computed(() => this.authService.hasPermission('people:employee:edit'));
 
-  profileForm = this.fb.group({
-    name: ['', Validators.required],
-    nickname: [''],
-    email: ['', [Validators.required, Validators.email]],
-    phone: [''],
-    dateOfBirth: [''],
-    currentAddress: [''],
-    permanentAddress: [''],
-    jobTitle: ['', Validators.required],
-    department: [''],
-    site: [''],
-    citizenId: [''],
-    taxId: [''],
+  // FIX: Use new FormGroup and new FormControl instead of FormBuilder to avoid injection issues.
+  profileForm = new FormGroup({
+    name: new FormControl('', Validators.required),
+    nickname: new FormControl(''),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    phone: new FormControl(''),
+    dateOfBirth: new FormControl(''),
+    currentAddress: new FormControl(''),
+    permanentAddress: new FormControl(''),
+    jobTitle: new FormControl('', Validators.required),
+    department: new FormControl(''),
+    site: new FormControl(''),
+    citizenId: new FormControl(''),
+    taxId: new FormControl(''),
   });
 
   constructor() {
