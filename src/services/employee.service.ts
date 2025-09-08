@@ -85,10 +85,10 @@ const MOCK_EMPLOYEES: Employee[] = [
     certificates: [{ name: 'AWS Certified Solutions Architect – Professional', issuer: 'Amazon Web Services', issueDate: '2019-03-15', expiryDate: '2025-03-15' }]
   },
   { 
-    id: 3, name: 'Jane Smith', nickname: 'Jane', email: 'jane.smith@example.com', jobTitle: 'CFO', department: 'Finance', site: 'HQ', status: 'Active', managerId: 1, startDate: '2020-03-10T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=jane.smith@example.com', selected: false,
+    id: 3, name: 'Jane Smith', nickname: 'Jane', email: 'jane.smith@example.com', jobTitle: 'VP of Finance', department: 'Finance', site: 'HQ', status: 'Active', managerId: 1, startDate: '2020-03-10T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=jane.smith@example.com', selected: false,
     phone: '+1 555-0102', dateOfBirth: '1990-01-25', currentAddress: '789 Pine St, Anytown, USA 12345', permanentAddress: '789 Pine St, Anytown, USA 12345', citizenId: '345-678-9012', taxId: '765-432-1098', siteEmoji: '🏢', salary: '$175,000', location: 'London, UK',
     emergencyContacts: [{ name: 'Jim Smith', relationship: 'Brother', phone: '777-888-9999' }],
-    employmentHistory: [{ jobTitle: 'CFO', department: 'Finance', startDate: '2020-03-10T09:00:00Z', endDate: null }],
+    employmentHistory: [{ jobTitle: 'VP of Finance', department: 'Finance', startDate: '2020-03-10T09:00:00Z', endDate: null }],
     educationHistory: [{ level: 'Bachelor of Commerce', field: 'Accounting', institution: 'London School of Economics', yearOfGraduation: 2011 }],
     certificates: [{ name: 'Certified Public Accountant (CPA)', issuer: 'AICPA', issueDate: '2013-08-20', expiryDate: null }]
   },
@@ -109,18 +109,18 @@ const MOCK_EMPLOYEES: Employee[] = [
     certificates: []
   },
   { 
-    id: 6, name: 'Chris Lee', nickname: 'Chris', email: 'chris.lee@example.com', jobTitle: 'Accountant', department: 'Finance', site: 'HQ', status: 'Active', managerId: 3, startDate: '2022-01-10T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=chris.lee@example.com', selected: false,
+    id: 6, name: 'Chris Lee', nickname: 'Chris', email: 'chris.lee@example.com', jobTitle: 'Senior Financial Analyst', department: 'Finance', site: 'HQ', status: 'Active', managerId: 3, startDate: '2022-01-10T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=chris.lee@example.com', selected: false,
     phone: '+1 555-0105', dateOfBirth: '1995-09-05', currentAddress: '333 Cedar Ln, Anytown, USA 12345', permanentAddress: '333 Cedar Ln, Anytown, USA 12345', citizenId: '678-901-2345', taxId: '432-109-8765', siteEmoji: '🏢', salary: '$95,000', location: 'Sydney, Australia',
     emergencyContacts: [{ name: 'Michelle Lee', relationship: 'Sister', phone: '345-345-3456' }],
-    employmentHistory: [{ jobTitle: 'Accountant', department: 'Finance', startDate: '2022-01-10T09:00:00Z', endDate: null }],
+    employmentHistory: [{ jobTitle: 'Senior Financial Analyst', department: 'Finance', startDate: '2022-01-10T09:00:00Z', endDate: null }],
     educationHistory: [{ level: 'Bachelor of Business', field: 'Finance', institution: 'University of Sydney', yearOfGraduation: 2017 }],
     certificates: []
   },
   { 
-    id: 7, name: 'Patricia Brown', nickname: 'Pat', email: 'patricia.brown@example.com', jobTitle: 'Junior Accountant', department: 'Finance', site: 'Remote', status: 'Invited', managerId: 3, startDate: '2023-08-01T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=patricia.brown@example.com', selected: false,
+    id: 7, name: 'Patricia Brown', nickname: 'Pat', email: 'patricia.brown@example.com', jobTitle: 'Financial Analyst', department: 'Finance', site: 'Remote', status: 'Invited', managerId: 3, startDate: '2023-08-01T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=patricia.brown@example.com', selected: false,
     phone: '+1 555-0106', dateOfBirth: '1998-03-12', currentAddress: '444 Spruce Way, Anytown, USA 12345', permanentAddress: '444 Spruce Way, Anytown, USA 12345', citizenId: '789-012-3456', taxId: '321-098-7654', siteEmoji: '🏠', salary: '$70,000', location: 'Toronto, Canada',
     emergencyContacts: [{ name: 'David Brown', relationship: 'Father', phone: '456-456-4567' }],
-    employmentHistory: [{ jobTitle: 'Junior Accountant', department: 'Finance', startDate: '2023-08-01T09:00:00Z', endDate: null }],
+    employmentHistory: [{ jobTitle: 'Financial Analyst', department: 'Finance', startDate: '2023-08-01T09:00:00Z', endDate: null }],
     educationHistory: [{ level: 'Diploma', field: 'Accounting', institution: 'Toronto School of Business', yearOfGraduation: 2020 }],
     certificates: []
   },
