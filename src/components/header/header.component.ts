@@ -13,13 +13,23 @@ export class HeaderComponent {
   showUserMenu = signal(false);
 
   navItems = signal([
-    { name: 'Dashboard', path: '/dashboard', disabled: false },
-    { name: 'People', path: '/people', disabled: false },
-    { name: 'Time', path: '#', disabled: true },
-    { name: 'T&E', path: '#', disabled: true },
-    { name: 'Contracts', path: '#', disabled: true },
-    { name: 'Talent', path: '#', disabled: true },
-    { name: 'Payroll', path: '#', disabled: true },
+    { name: 'Dashboard', path: '/dashboard', disabled: false, children: [] },
+    { 
+      name: 'Core', 
+      path: '/core/employee', 
+      disabled: false, 
+      children: [
+        { name: 'Employee', path: '/core/employee', disabled: false },
+        { name: 'Organization', path: '#', disabled: true },
+        { name: 'Management', path: '#', disabled: true },
+        { name: 'Security and Policy', path: '#', disabled: true },
+      ] 
+    },
+    { name: 'Time', path: '#', disabled: true, children: [] },
+    { name: 'T&E', path: '#', disabled: true, children: [] },
+    { name: 'Contracts', path: '#', disabled: true, children: [] },
+    { name: 'Talent', path: '#', disabled: true, children: [] },
+    { name: 'Payroll', path: '#', disabled: true, children: [] },
   ]);
 
   toggleUserMenu(): void {

@@ -114,6 +114,6 @@ export class EmployeeDetailComponent {
   }
 
   goBack(): void {
-    this.router.navigate(['/people']);
+    this.router.navigate(['/core/employee']);
   }
 }

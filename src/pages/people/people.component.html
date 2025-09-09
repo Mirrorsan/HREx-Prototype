@@ -2,7 +2,7 @@
   <!-- Control Panel Card -->
   <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6">
     <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-      <h1 class="text-2xl font-bold text-slate-800">People</h1>
+      <h1 class="text-2xl font-bold text-slate-800">Employees</h1>
       <div class="flex items-center bg-slate-100 p-1 rounded-lg">
         <button (click)="setView('list')" [class]="activeView() === 'list' ? 'bg-slate-800 text-white shadow-sm' : 'bg-transparent text-slate-600 hover:bg-white/60'" class="px-4 py-1.5 rounded-md text-sm font-medium transition-all">
           Directory
@@ -15,11 +15,32 @@
 
     <!-- Actions and Search -->
     <div class="mt-4 border-t border-slate-200 pt-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-      <div class="relative w-full sm:max-w-xs">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      <div class="flex flex-col sm:flex-row items-center gap-4 flex-grow w-full">
+        <!-- Search Input -->
+        <div class="relative w-full sm:max-w-xs">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
+          <input type="text" (input)="onSearch($event)" [value]="searchQuery()" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
         </div>
-        <input type="text" (input)="onSearch($event)" [value]="searchQuery()" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
+        <!-- Filters -->
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <select (change)="onDepartmentChange($event)" class="w-full sm:w-auto block border border-slate-300 rounded-md py-2 px-3 text-sm focus:ring-yellow-500 focus:border-yellow-500 text-slate-700">
+            @for(dept of departments(); track dept) {
+              <option [value]="dept">{{ dept === 'all' ? 'All Departments' : dept }}</option>
+            }
+          </select>
+           <select (change)="onSiteChange($event)" class="w-full sm:w-auto block border border-slate-300 rounded-md py-2 px-3 text-sm focus:ring-yellow-500 focus:border-yellow-500 text-slate-700">
+            @for(site of sites(); track site) {
+              <option [value]="site">{{ site === 'all' ? 'All Sites' : site }}</option>
+            }
+          </select>
+           <select (change)="onStatusChange($event)" class="w-full sm:w-auto block border border-slate-300 rounded-md py-2 px-3 text-sm focus:ring-yellow-500 focus:border-yellow-500 text-slate-700">
+            @for(status of statuses(); track status) {
+              <option [value]="status">{{ status === 'all' ? 'All Statuses' : status }}</option>
+            }
+          </select>
+        </div>
       </div>
       <div class="flex items-center justify-end gap-2 shrink-0">
         @if (canAddEmployee()) {
@@ -40,14 +61,11 @@
 
   <!-- Content Area -->
   @if (activeView() === 'list') {
-    <div class="mt-0 bg-white rounded-xl shadow-sm overflow-hidden flex-1">
-      <div class="overflow-x-auto h-full">
+    <div class="mt-0 bg-white rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col">
+      <div class="overflow-auto flex-grow">
         <table class="min-w-full divide-y divide-slate-200">
-          <thead class="bg-slate-50">
+          <thead class="bg-slate-50 sticky top-0 z-10">
             <tr>
-              <th scope="col" class="px-6 py-3 text-left">
-                <input type="checkbox" (change)="toggleAllSelection($event)" class="h-4 w-4 text-yellow-600 border-slate-300 rounded focus:ring-yellow-500">
-              </th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Name</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Nickname</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Job title</th>
@@ -62,11 +80,8 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-slate-200">
-            @for (employee of filteredEmployees(); track employee.id; let i = $index) {
+            @for (employee of paginatedEmployees(); track employee.id; let i = $index) {
               <tr class="animate-row hover:bg-slate-50" [style.animation-delay]="i * 30 + 'ms'">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <input type="checkbox" (change)="toggleSelection(employee.id)" [checked]="employee.selected" class="h-4 w-4 text-yellow-600 border-slate-300 rounded focus:ring-yellow-500">
-                </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-10 w-10">
@@ -127,14 +142,42 @@
               </tr>
             } @empty {
               <tr>
-                <td [attr.colspan]="canManageEmployees() ? 10 : 9" class="text-center py-12">
-                  <div class="text-slate-500">No employees found.</div>
+                <td [attr.colspan]="canManageEmployees() ? 9 : 8" class="text-center py-12">
+                  <div class="text-slate-500">
+                    @if(searchQuery()) {
+                      No employees found for "{{ searchQuery() }}".
+                    } @else {
+                      No employees match the current filters.
+                    }
+                  </div>
                 </td>
               </tr>
             }
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination Controls -->
+      @if (filteredEmployees().length > 0) {
+        <div class="p-4 border-t border-slate-200 flex items-center justify-between">
+          <div class="text-sm text-slate-600">
+            Showing <span class="font-medium">{{ (currentPage() - 1) * pageSize + 1 }}</span> to <span class="font-medium">{{ (currentPage() - 1) * pageSize + paginatedEmployees().length }}</span> of <span class="font-medium">{{ filteredEmployees().length }}</span> results
+          </div>
+          @if (totalPages() > 1) {
+            <div class="flex items-center gap-2">
+              <button (click)="previousPage()" [disabled]="currentPage() === 1" class="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Previous
+              </button>
+              <span class="text-sm text-slate-500">
+                Page {{ currentPage() }} of {{ totalPages() }}
+              </span>
+              <button (click)="nextPage()" [disabled]="currentPage() === totalPages()" class="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Next
+              </button>
+            </div>
+          }
+        </div>
+      }
     </div>
   } @else {
     <div class="mt-0 flex-1 min-h-0">

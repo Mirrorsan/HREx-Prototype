@@ -15,8 +15,14 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'people', component: PeopleComponent },
-      { path: 'people/:id', component: EmployeeDetailComponent },
+      {
+        path: 'core',
+        children: [
+          { path: '', redirectTo: 'employee', pathMatch: 'full' },
+          { path: 'employee', component: PeopleComponent },
+          { path: 'employee/:id', component: EmployeeDetailComponent },
+        ],
+      },
     ],
   },
   // Redirect any unknown paths to the login page as a fallback
