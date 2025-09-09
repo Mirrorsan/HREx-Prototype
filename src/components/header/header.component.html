@@ -1,43 +1,48 @@
-<header class="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
+<header class="bg-white/80 backdrop-blur-sm shadow-md sticky top-0 z-10">
   <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <h1 class="text-2xl font-bold text-slate-800">HREx</h1>
-        </div>
-        <nav class="hidden md:flex md:ml-10 md:space-x-4">
-          @for (item of navItems(); track item.name) {
-            @if (!item.disabled) {
-              <a [routerLink]="item.path"
-                 routerLinkActive="bg-slate-200 text-slate-900"
-                 [routerLinkActiveOptions]="{exact: true}"
-                 class="px-3 py-2 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-100">
-                {{ item.name }}
-              </a>
-            } @else {
-              <span class="px-3 py-2 rounded-md text-sm font-medium text-slate-400 cursor-not-allowed opacity-50">
-                {{ item.name }}
-              </span>
-            }
-          }
-        </nav>
+    <div class="relative flex items-center justify-between h-16">
+      <!-- Left side: Logo -->
+      <div class="flex-shrink-0">
+        <a routerLink="/dashboard" class="flex items-center">
+           <h1 class="text-2xl font-bold text-slate-800">HREx</h1>
+        </a>
       </div>
-      <div class="flex items-center space-x-4">
-        <button class="p-2 rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-700">
-          <span class="sr-only">Settings</span>
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+
+      <!-- Centered Navigation -->
+      <nav class="hidden md:flex absolute left-1/2 -translate-x-1/2 space-x-4">
+        @for (item of navItems(); track item.name) {
+          @if (!item.disabled) {
+            <a [routerLink]="item.path"
+               routerLinkActive="bg-slate-200 text-slate-900"
+               [routerLinkActiveOptions]="{exact: true}"
+               class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-100">
+              {{ item.name }}
+            </a>
+          } @else {
+            <span class="px-3 py-2 rounded-md text-sm font-medium text-slate-400 cursor-not-allowed">
+              {{ item.name }}
+            </span>
+          }
+        }
+      </nav>
+
+      <!-- Right side: Icons and User menu -->
+      <div class="flex items-center space-x-2 rounded-full p-1">
+        <button class="p-2 rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-800">
+          <span class="sr-only">Search</span>
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
         </button>
-        <button class="p-2 rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-700">
+        <button class="p-2 rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-800">
           <span class="sr-only">View notifications</span>
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
         </button>
         <div class="relative">
-          <button (click)="toggleUserMenu()" class="w-8 h-8 rounded-full overflow-hidden block">
+          <button (click)="toggleUserMenu()" class="w-8 h-8 rounded-full overflow-hidden block ring-2 ring-transparent hover:ring-slate-300">
             <img class="w-full h-full object-cover" [src]="authService.currentUser()?.avatar" alt="User avatar">
           </button>
 
           @if (showUserMenu()) {
-            <div class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-20">
+            <div class="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-20">
               <div class="px-4 py-2 border-b border-slate-200">
                 <p class="text-sm font-semibold text-slate-800">{{ authService.currentUser()?.name }}</p>
                 <p class="text-xs text-slate-500">

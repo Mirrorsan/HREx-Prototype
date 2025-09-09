@@ -18,26 +18,26 @@
   </div>
 
   <!-- Onboarding Task List -->
-  <div class="bg-slate-800 text-white rounded-xl shadow-sm p-6">
+  <div class="bg-white rounded-xl shadow-sm p-6">
     <div class="flex justify-between items-center">
-      <h3 class="text-lg font-bold">Onboarding Task</h3>
-      <span class="text-sm font-semibold bg-slate-700 px-3 py-1 rounded-full">2/8</span>
+      <h3 class="text-lg font-bold text-slate-800">Onboarding Task</h3>
+      <span class="text-sm font-semibold bg-slate-100 text-slate-700 px-3 py-1 rounded-full">2/8</span>
     </div>
     <div class="mt-6 relative">
       <!-- Vertical line -->
-      <div class="absolute left-4 top-0 h-full w-0.5 bg-slate-700"></div>
+      <div class="absolute left-4 top-0 h-full w-0.5 bg-slate-200"></div>
       
       <div class="space-y-6">
         @for(task of tasks(); track task.name) {
           <div class="flex items-center relative">
-            <div class="z-10 w-8 h-8 rounded-full flex items-center justify-center" [class]="task.completed ? 'bg-green-500' : task.active ? 'bg-yellow-400' : 'border-2 border-slate-600 bg-slate-800'">
+            <div class="z-10 w-8 h-8 rounded-full flex items-center justify-center" [class]="task.completed ? 'bg-green-500' : task.active ? 'bg-yellow-400' : 'border-2 border-slate-300 bg-white'">
               @if (task.completed) {
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
               }
             </div>
             <div class="ml-4">
-              <p class="font-semibold" [class]="task.active ? 'text-yellow-400' : 'text-white'">{{ task.name }}</p>
-              <p class="text-sm text-slate-400">{{ task.time }}</p>
+              <p class="font-semibold" [class]="task.active ? 'text-yellow-600' : 'text-slate-800'">{{ task.name }}</p>
+              <p class="text-sm text-slate-500">{{ task.time }}</p>
             </div>
           </div>
         }
