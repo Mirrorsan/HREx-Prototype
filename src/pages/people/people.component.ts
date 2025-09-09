@@ -176,7 +176,7 @@ export class PeopleComponent {
   }
 
   editEmployee(employee: Employee): void {
-    this.router.navigate(['/people', employee.id]);
+    this.router.navigate(['/core/employee', employee.id]);
     this.activeActionMenu.set(null);
   }
 

@@ -5,9 +5,9 @@ import { HeaderComponent } from '../components/header/header.component';
 @Component({
   selector: 'app-main-layout',
   template: `
-    <div class="flex flex-col h-screen bg-transparent">
+    <div class="min-h-screen bg-transparent">
       <app-header></app-header>
-      <main class="flex-1 overflow-y-auto">
+      <main>
         <router-outlet></router-outlet>
       </main>
     </div>

@@ -5,6 +5,7 @@ import { EmployeeDetailComponent } from './pages/employee-detail/employee-detail
 import { LoginComponent } from './pages/login/login.component';
 import { MainLayoutComponent } from './layouts/main-layout.component';
 import { authGuard } from './services/auth.guard';
+import { SettingsComponent } from './pages/settings/settings.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -23,6 +24,7 @@ export const routes: Routes = [
           { path: 'employee/:id', component: EmployeeDetailComponent },
         ],
       },
+      { path: 'settings', component: SettingsComponent },
     ],
   },
   // Redirect any unknown paths to the login page as a fallback
