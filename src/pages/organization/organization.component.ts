@@ -3,18 +3,24 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DepartmentService, DepartmentNode } from '../../services/department.service';
 import { DepartmentOrgChartComponent } from '../../components/department-org-chart/department-org-chart.component';
+import { AddDepartmentModalComponent } from '../../components/add-department-modal/add-department-modal.component';
+import { EmployeeService } from '../../services/employee.service';
+import { AssignEmployeeModalComponent } from '../../components/assign-employee-modal/assign-employee-modal.component';
 
 @Component({
   selector: 'app-organization',
   templateUrl: './organization.component.html',
   styleUrls: ['./organization.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, DepartmentOrgChartComponent],
+  imports: [CommonModule, RouterLink, DepartmentOrgChartComponent, AddDepartmentModalComponent, AssignEmployeeModalComponent],
 })
 export class OrganizationComponent {
   private departmentService = inject(DepartmentService);
+  private employeeService = inject(EmployeeService);
   
   activeView = signal<'list' | 'orgChart'>('list');
+  showAddDepartmentModal = signal(false);
+  showAssignEmployeeModal = signal(false);
   private departments = this.departmentService.departmentTree;
   
   expandedDepartments = signal<Set<string>>(new Set());
@@ -85,6 +91,32 @@ export class OrganizationComponent {
   onSearch(event: Event): void {
     const query = (event.target as HTMLInputElement).value;
     this.searchQuery.set(query);
+  }
+
+  openAddDepartmentModal(): void {
+    this.showAddDepartmentModal.set(true);
+  }
+
+  closeAddDepartmentModal(): void {
+    this.showAddDepartmentModal.set(false);
+  }
+
+  handleAddDepartment({ departmentName, managerId }: { departmentName: string; managerId: number }): void {
+    this.employeeService.assignManagerToNewDepartment(managerId, departmentName);
+    this.closeAddDepartmentModal();
+  }
+
+  openAssignEmployeeModal(): void {
+    this.showAssignEmployeeModal.set(true);
+  }
+
+  closeAssignEmployeeModal(): void {
+    this.showAssignEmployeeModal.set(false);
+  }
+  
+  handleAssignEmployee({ employeeId, departmentName }: { employeeId: number, departmentName: string }): void {
+    this.employeeService.assignEmployeeToDepartment(employeeId, departmentName);
+    this.closeAssignEmployeeModal();
   }
 
   addSubDepartment(parentDept: DepartmentNode): void {

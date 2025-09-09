@@ -23,10 +23,15 @@
           </div>
           <input type="text" (input)="onSearch($event)" [value]="searchQuery()" placeholder="Search departments..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
         </div>
-        <button class="h-9 px-4 inline-flex items-center justify-center gap-2 text-sm font-medium text-white bg-slate-800 rounded-md shadow-sm hover:bg-slate-700 flex-shrink-0">
-          <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-          Add Department
-        </button>
+        <div class="flex items-center gap-2">
+            <button (click)="openAssignEmployeeModal()" class="h-9 px-4 inline-flex items-center justify-center gap-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50">
+                Assign Employee
+            </button>
+            <button (click)="openAddDepartmentModal()" class="h-9 px-4 inline-flex items-center justify-center gap-2 text-sm font-medium text-white bg-slate-800 rounded-md shadow-sm hover:bg-slate-700 flex-shrink-0">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+              Add Department
+            </button>
+        </div>
       </div>
     }
   </div>
@@ -50,35 +55,54 @@
   }
 </div>
 
+<!-- Add Department Modal -->
+@if(showAddDepartmentModal()) {
+  <app-add-department-modal 
+    (close)="closeAddDepartmentModal()" 
+    (add)="handleAddDepartment($event)">
+  </app-add-department-modal>
+}
+
+<!-- Assign Employee Modal -->
+@if(showAssignEmployeeModal()) {
+    <app-assign-employee-modal
+        (close)="closeAssignEmployeeModal()"
+        (assign)="handleAssignEmployee($event)">
+    </app-assign-employee-modal>
+}
+
 
 <!-- Recursive Template for Departments -->
 <ng-template #departmentTreeTemplate let-departments="departments" let-level="level">
   @for(dept of departments; track dept.id) {
     <div class="department-row">
       <div class="group flex items-center p-2 rounded-md hover:bg-slate-50" [style.padding-left.rem]="level * 1.5">
-        <!-- Toggle Button -->
-        <button (click)="toggleDepartment(dept.id)" [class.invisible]="dept.children.length === 0 && dept.members.length === 0" class="mr-2 p-1 rounded-full hover:bg-slate-200">
-            <svg class="w-4 h-4 text-slate-500 transition-transform" [class.rotate-90]="expandedDepartments().has(dept.id)" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-        </button>
-        
-        <!-- Manager Avatar & Dept Info -->
-        @if(dept.manager) {
-            <img [src]="dept.manager.avatar" class="w-10 h-10 rounded-full object-cover mr-4">
-        } @else {
-            <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center mr-4 flex-shrink-0">
-                <svg class="w-6 h-6 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6M9 11.25h6M9 15.75h6" /></svg>
+        <div class="flex items-center flex-grow cursor-pointer" (click)="toggleDepartment(dept.id)">
+            <!-- Toggle Button -->
+            <button [class.invisible]="dept.children.length === 0 && dept.members.length === 0" class="mr-2 p-1 rounded-full hover:bg-slate-200">
+                <svg class="w-4 h-4 text-slate-500 transition-transform" [class.rotate-90]="expandedDepartments().has(dept.id)" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5-7.5" /></svg>
+            </button>
+            
+            <!-- Manager Avatar -->
+            @if(dept.manager) {
+                <img [src]="dept.manager.avatar" class="w-10 h-10 rounded-full object-cover mr-4">
+            } @else {
+                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center mr-4 flex-shrink-0">
+                    <svg class="w-6 h-6 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6M9 11.25h6M9 15.75h6" /></svg>
+                </div>
+            }
+            
+             <!-- Dept Info -->
+            <div class="flex-grow">
+                <p class="font-semibold text-slate-800">{{ dept.name }}</p>
+                <p class="text-sm text-slate-500">
+                    @if(dept.manager) {
+                        <span>Managed by {{ dept.manager.name }}</span>
+                        <span class="mx-2">•</span>
+                    }
+                    <span>{{ dept.memberCount }} {{ dept.memberCount === 1 ? 'member' : 'members' }}</span>
+                </p>
             </div>
-        }
-        
-        <div class="flex-grow">
-            <p class="font-semibold text-slate-800">{{ dept.name }}</p>
-            <p class="text-sm text-slate-500">
-                @if(dept.manager) {
-                    <span>Managed by {{ dept.manager.name }}</span>
-                    <span class="mx-2">•</span>
-                }
-                <span>{{ dept.memberCount }} {{ dept.memberCount === 1 ? 'member' : 'members' }}</span>
-            </p>
         </div>
 
         <!-- Actions -->

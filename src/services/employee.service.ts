@@ -377,4 +377,20 @@ export class EmployeeService {
       )
     );
   }
+
+  assignManagerToNewDepartment(managerId: number, departmentName: string): void {
+    this.employees.update(employees =>
+      employees.map(emp =>
+        emp.id === managerId ? { ...emp, department: departmentName } : emp
+      )
+    );
+  }
+
+  assignEmployeeToDepartment(employeeId: number, departmentName: string): void {
+    this.employees.update(employees =>
+      employees.map(emp =>
+        emp.id === employeeId ? { ...emp, department: departmentName } : emp
+      )
+    );
+  }
 }
