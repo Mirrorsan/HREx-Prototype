@@ -6,6 +6,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { MainLayoutComponent } from './layouts/main-layout.component';
 import { authGuard } from './services/auth.guard';
 import { SettingsComponent } from './pages/settings/settings.component';
+import { OrganizationComponent } from './pages/organization/organization.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -22,6 +23,7 @@ export const routes: Routes = [
           { path: '', redirectTo: 'employee', pathMatch: 'full' },
           { path: 'employee', component: PeopleComponent },
           { path: 'employee/:id', component: EmployeeDetailComponent },
+          { path: 'organization', component: OrganizationComponent },
         ],
       },
       { path: 'settings', component: SettingsComponent },

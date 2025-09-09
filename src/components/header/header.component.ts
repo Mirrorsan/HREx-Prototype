@@ -20,7 +20,7 @@ export class HeaderComponent {
       disabled: false, 
       children: [
         { name: 'Employee', path: '/core/employee', disabled: false },
-        { name: 'Organization', path: '#', disabled: true },
+        { name: 'Organization', path: '/core/organization', disabled: false },
         { name: 'Management', path: '#', disabled: true },
         { name: 'Security and Policy', path: '#', disabled: true },
       ] 
