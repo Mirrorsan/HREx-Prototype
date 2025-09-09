@@ -1,12 +1,14 @@
 <div class="p-4 sm:p-6 lg:p-8 space-y-6 h-[calc(100vh-4rem)] flex flex-col">
   <!-- Header Card -->
-  <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+  <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 animate-in" style="animation-delay: 100ms;">
     <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
       <div>
         <h1 class="text-2xl font-bold text-slate-800">Department Management</h1>
-        <p class="text-sm text-slate-500 mt-1">Manage the company's departmental structure.</p>
+        <p class="text-sm text-slate-500 mt-1">Manage the company's departmental structure and hierarchy.</p>
       </div>
-      <div class="flex items-center bg-slate-100 p-1 rounded-lg">
+    </div>
+    <div class="mt-4 border-t border-slate-200 pt-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+       <div class="flex items-center bg-slate-100 p-1 rounded-lg">
         <button (click)="setView('list')" [class]="activeView() === 'list' ? 'bg-slate-800 text-white shadow-sm' : 'bg-transparent text-slate-600 hover:bg-white/60'" class="px-4 py-1.5 rounded-md text-sm font-medium transition-all">
           List View
         </button>
@@ -14,31 +16,87 @@
           Org Chart
         </button>
       </div>
-    </div>
-    @if(activeView() === 'list') {
-      <div class="mt-4 border-t border-slate-200 pt-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-        <div class="relative w-full sm:max-w-xs">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      <div class="flex items-center gap-4 w-full sm:w-auto">
+        @if(activeView() === 'list') {
+          <div class="relative w-full sm:max-w-xs">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input type="text" (input)="onSearch($event)" [value]="searchQuery()" placeholder="Search departments..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
           </div>
-          <input type="text" (input)="onSearch($event)" [value]="searchQuery()" placeholder="Search departments..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm">
-        </div>
-        <div class="flex items-center gap-2">
-            <button (click)="openAssignEmployeeModal()" class="h-9 px-4 inline-flex items-center justify-center gap-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50">
+        }
+        <div class="flex items-center gap-2 flex-shrink-0">
+            <button (click)="openAssignEmployeeModal()" class="h-9 px-4 hidden sm:inline-flex items-center justify-center gap-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50">
                 Assign Employee
             </button>
-            <button (click)="openAddDepartmentModal()" class="h-9 px-4 inline-flex items-center justify-center gap-2 text-sm font-medium text-white bg-slate-800 rounded-md shadow-sm hover:bg-slate-700 flex-shrink-0">
+            <button (click)="openAddDepartmentModal()" class="h-9 px-4 inline-flex items-center justify-center gap-2 text-sm font-medium text-white bg-slate-800 rounded-md shadow-sm hover:bg-slate-700">
               <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
               Add Department
             </button>
         </div>
       </div>
-    }
+    </div>
   </div>
 
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 animate-in" style="animation-delay: 200ms;">
+    <div class="bg-white rounded-xl shadow-sm p-6 flex flex-col">
+        <div class="flex justify-between items-start">
+            <div class="flex items-center gap-2">
+                <span class="w-1 h-4 rounded-full bg-red-500"></span>
+                <h3 class="text-sm font-medium text-slate-500">Total Departments</h3>
+            </div>
+            <a href="#" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5-7.5" /></svg></a>
+        </div>
+        <div class="mt-4 flex-grow">
+            <p class="text-4xl font-bold text-slate-800">{{ totalDepartments() }}</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 flex flex-col">
+        <div class="flex justify-between items-start">
+            <div class="flex items-center gap-2">
+                <span class="w-1 h-4 rounded-full bg-green-500"></span>
+                <h3 class="text-sm font-medium text-slate-500">Total Employees</h3>
+            </div>
+            <a href="#" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5-7.5" /></svg></a>
+        </div>
+        <div class="mt-4 flex-grow">
+            <p class="text-4xl font-bold text-slate-800">{{ totalEmployees() }}</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 flex flex-col">
+        <div class="flex justify-between items-start">
+            <div class="flex items-center gap-2">
+                <span class="w-1 h-4 rounded-full bg-blue-500"></span>
+                <h3 class="text-sm font-medium text-slate-500">Avg. Department Size</h3>
+            </div>
+            <a href="#" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5-7.5" /></svg></a>
+        </div>
+        <div class="mt-4 flex-grow">
+            <p class="text-4xl font-bold text-slate-800">{{ averageDepartmentSize() | number:'1.0-1' }}</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 flex flex-col">
+        <div class="flex justify-between items-start">
+            <div class="flex items-center gap-2">
+                <span class="w-1 h-4 rounded-full bg-yellow-500"></span>
+                <h3 class="text-sm font-medium text-slate-500">Largest Department</h3>
+            </div>
+            <a href="#" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5-7.5" /></svg></a>
+        </div>
+        <div class="mt-4 flex-grow">
+            <p class="text-4xl font-bold text-slate-800 truncate">{{ largestDepartment().name }}</p>
+        </div>
+        <div class="mt-1">
+            <p class="text-sm text-slate-500">{{ largestDepartment().count }} members</p>
+        </div>
+    </div>
+  </div>
+
+
   <!-- Content Area -->
-  @if (activeView() === 'list') {
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col min-h-0">
+  <div class="bg-white rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col min-h-0 animate-in" style="animation-delay: 300ms;">
+    @if (activeView() === 'list') {
       <div class="overflow-auto flex-grow">
         <div class="p-4 sm:p-6">
           <ng-container 
@@ -47,12 +105,12 @@
           </ng-container>
         </div>
       </div>
-    </div>
-  } @else {
-    <div class="mt-0 flex-1 min-h-0">
-      <app-department-org-chart></app-department-org-chart>
-    </div>
-  }
+    } @else {
+      <div class="mt-0 flex-1 min-h-0">
+        <app-department-org-chart></app-department-org-chart>
+      </div>
+    }
+  </div>
 </div>
 
 <!-- Add Department Modal -->
@@ -124,6 +182,7 @@
             <!-- Render Members -->
             <div class="py-1" [style.padding-left.rem]="(level + 1) * 1.5">
                 @for(member of dept.members; track member.id) {
+                  @if(isRegularMember(dept, member)) {
                     <a [routerLink]="['/core/employee', member.id]" class="flex items-center p-2 rounded-md hover:bg-slate-100 text-sm">
                         <img [src]="member.avatar" class="w-8 h-8 rounded-full object-cover mr-3">
                         <div>
@@ -132,6 +191,7 @@
                         </div>
                          <span class="ml-auto text-xs font-medium text-slate-400 hover:text-slate-600">View Profile →</span>
                     </a>
+                  }
                 }
             </div>
         </div>

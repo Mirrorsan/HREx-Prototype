@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DepartmentService, DepartmentNode } from '../../services/department.service';
 import { DepartmentOrgChartComponent } from '../../components/department-org-chart/department-org-chart.component';
 import { AddDepartmentModalComponent } from '../../components/add-department-modal/add-department-modal.component';
-import { EmployeeService } from '../../services/employee.service';
+import { EmployeeService, Employee } from '../../services/employee.service';
 import { AssignEmployeeModalComponent } from '../../components/assign-employee-modal/assign-employee-modal.component';
 
 @Component({
@@ -12,7 +12,7 @@ import { AssignEmployeeModalComponent } from '../../components/assign-employee-m
   templateUrl: './organization.component.html',
   styleUrls: ['./organization.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink, DepartmentOrgChartComponent, AddDepartmentModalComponent, AssignEmployeeModalComponent],
+  imports: [CommonModule, RouterLink, DepartmentOrgChartComponent, AddDepartmentModalComponent, AssignEmployeeModalComponent, DecimalPipe],
 })
 export class OrganizationComponent {
   private departmentService = inject(DepartmentService);
@@ -25,6 +25,35 @@ export class OrganizationComponent {
   
   expandedDepartments = signal<Set<string>>(new Set());
   searchQuery = signal('');
+
+  // KPI Signals
+  totalEmployees = computed(() => this.employeeService.getEmployees()().length);
+
+  private countDepartments(nodes: DepartmentNode[]): number {
+    return nodes.reduce((acc, node) => acc + 1 + this.countDepartments(node.children), 0);
+  }
+  totalDepartments = computed(() => this.countDepartments(this.departments()));
+  
+  averageDepartmentSize = computed(() => {
+    const totalDept = this.totalDepartments();
+    const totalEmp = this.totalEmployees();
+    if (totalDept === 0) return 0;
+    return totalEmp / totalDept;
+  });
+
+  private findLargestDepartment(nodes: DepartmentNode[], currentLargest: { name: string, count: number }): { name: string, count: number } {
+    return nodes.reduce((largest, node) => {
+      let newLargest = node.memberCount > largest.count ? { name: node.name, count: node.memberCount } : largest;
+      return this.findLargestDepartment(node.children, newLargest);
+    }, currentLargest);
+  }
+  largestDepartment = computed(() => {
+    if (this.departments().length === 0) {
+      return { name: 'N/A', count: 0 };
+    }
+    return this.findLargestDepartment(this.departments(), { name: '', count: 0 });
+  });
+
 
   filteredDepartments = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
@@ -140,5 +169,11 @@ export class OrganizationComponent {
       alert(`Functionality to delete ${dept.name} is not yet implemented.`);
       // Future: call departmentService.deleteDepartment(dept.id);
     }
+  }
+
+  isRegularMember(dept: DepartmentNode, member: Employee): boolean {
+    const isNotDeptManager = dept.manager?.id !== member.id;
+    const isNotChildDeptManager = !dept.children.some(child => child.manager?.id === member.id);
+    return isNotDeptManager && isNotChildDeptManager;
   }
 }
