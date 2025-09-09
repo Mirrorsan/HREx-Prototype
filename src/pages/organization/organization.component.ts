@@ -2,17 +2,19 @@ import { Component, ChangeDetectionStrategy, inject, signal, computed, effect } 
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DepartmentService, DepartmentNode } from '../../services/department.service';
+import { DepartmentOrgChartComponent } from '../../components/department-org-chart/department-org-chart.component';
 
 @Component({
   selector: 'app-organization',
   templateUrl: './organization.component.html',
   styleUrls: ['./organization.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, DepartmentOrgChartComponent],
 })
 export class OrganizationComponent {
   private departmentService = inject(DepartmentService);
   
+  activeView = signal<'list' | 'orgChart'>('list');
   private departments = this.departmentService.departmentTree;
   
   expandedDepartments = signal<Set<string>>(new Set());
@@ -64,6 +66,10 @@ export class OrganizationComponent {
     });
   }
 
+  setView(view: 'list' | 'orgChart'): void {
+    this.activeView.set(view);
+  }
+
   toggleDepartment(departmentId: string): void {
     this.expandedDepartments.update(currentSet => {
       const newSet = new Set(currentSet);
@@ -79,5 +85,28 @@ export class OrganizationComponent {
   onSearch(event: Event): void {
     const query = (event.target as HTMLInputElement).value;
     this.searchQuery.set(query);
+  }
+
+  addSubDepartment(parentDept: DepartmentNode): void {
+    const newDeptName = prompt(`Enter name for new sub-department under ${parentDept.name}:`);
+    if (newDeptName) {
+      alert(`Functionality to add "${newDeptName}" to ${parentDept.name} is not yet implemented.`);
+      // Future: call departmentService.addDepartment(newDeptName, parentDept.id);
+    }
+  }
+
+  editDepartment(dept: DepartmentNode): void {
+    const updatedDeptName = prompt(`Enter new name for ${dept.name}:`, dept.name);
+    if (updatedDeptName && updatedDeptName !== dept.name) {
+      alert(`Functionality to rename "${dept.name}" to "${updatedDeptName}" is not yet implemented.`);
+      // Future: call departmentService.updateDepartment(dept.id, updatedDeptName);
+    }
+  }
+
+  deleteDepartment(dept: DepartmentNode): void {
+    if (confirm(`Are you sure you want to delete the ${dept.name} department? This action cannot be undone.`)) {
+      alert(`Functionality to delete ${dept.name} is not yet implemented.`);
+      // Future: call departmentService.deleteDepartment(dept.id);
+    }
   }
 }

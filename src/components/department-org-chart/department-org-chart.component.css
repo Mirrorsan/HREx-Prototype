@@ -1,0 +1,92 @@
+/* Use a more robust table-like layout for the tree */
+.org-tree {
+  white-space: nowrap;
+  margin: 0 auto;
+  text-align: center;
+  display: table; /* Use table display for better layout control */
+}
+
+.org-tree ul {
+  padding-top: 20px;
+  position: relative;
+  transition: all 0.5s;
+  display: table-row; /* Each level is a row */
+}
+
+.org-tree li {
+  display: table-cell; /* Each node is a cell */
+  vertical-align: top;
+  text-align: center;
+  list-style-type: none;
+  position: relative;
+  padding: 20px 8px 0 8px;
+  transition: all 0.5s;
+}
+
+/* Remove top padding for single children to avoid large gaps */
+.org-tree li:only-child {
+  padding-top: 0;
+}
+
+/* Connector lines: vertical line down from parent */
+.org-tree li::before, .org-tree li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 50%;
+  border-top: 2px solid #cbd5e1; /* slate-300 */
+  width: 50%;
+  height: 20px;
+}
+/* Connector lines: horizontal line */
+.org-tree li::after {
+  right: auto;
+  left: 50%;
+  border-left: 2px solid #cbd5e1; /* slate-300 */
+}
+
+/* Remove dangling connectors */
+.org-tree li:only-child::after, .org-tree li:only-child::before {
+  display: none;
+}
+.org-tree li:first-child::before, .org-tree li:last-child::after {
+  border: 0 none;
+}
+
+/* T-junctions for last child */
+.org-tree li:last-child::before {
+  border-right: 2px solid #cbd5e1; /* slate-300 */
+  border-radius: 0 5px 0 0;
+}
+/* T-junctions for first child */
+.org-tree li:first-child::after {
+  border-radius: 5px 0 0 0;
+}
+
+/* The root node doesn't need a connector line above it */
+.org-tree > ul > li {
+  /* The root is a table-cell, so it shouldn't have connectors above it */
+}
+.org-tree > ul > li::before, .org-tree > ul > li::after {
+   border: 0 none;
+}
+
+
+/* Vertical line coming from the parent's horizontal connector */
+.org-tree ul ul::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  border-left: 2px solid #cbd5e1; /* slate-300 */
+  width: 0;
+  height: 20px;
+}
+
+.node-content {
+  position: relative;
+}
+
+.node-card {
+  border: 2px solid transparent;
+}
