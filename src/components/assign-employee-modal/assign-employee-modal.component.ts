@@ -1,99 +1,91 @@
 import { Component, ChangeDetectionStrategy, output, inject, computed } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { EmployeeService } from '../../services/employee.service';
 import { DepartmentService, DepartmentNode } from '../../services/department.service';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-assign-employee-modal',
+  // FIX: Converted to an inline template as creating new files is not supported.
   template: `
-    <div class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50" (click)="close.emit()">
-      <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg relative" (click)="$event.stopPropagation()">
-        
-        <!-- Header -->
-        <div class="flex justify-between items-start mb-6">
-            <div>
-                <h2 class="text-xl font-bold text-slate-800">Assign Employee</h2>
-                <p class="text-sm text-slate-500">Move an employee to a different department.</p>
-            </div>
-            <button (click)="close.emit()" class="p-1 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold">Assign Employee to Department</h2>
+          <button (click)="onClose()" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
         </div>
-
-        <!-- Form -->
         <form [formGroup]="assignForm" (ngSubmit)="onSubmit()">
-          <div class="space-y-5">
+          <div class="space-y-4">
             <div>
-              <label for="employeeId" class="block text-sm font-medium text-slate-700">Employee</label>
-              <select id="employeeId" formControlName="employeeId" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label for="employeeId" class="block text-sm font-medium text-gray-700">Employee</label>
+              <select id="employeeId" formControlName="employeeId" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 <option [ngValue]="null" disabled>Select an employee</option>
-                @for (employee of employees(); track employee.id) {
-                  <option [value]="employee.id">{{ employee.name }} (Current: {{ employee.department }})</option>
+                @for(employee of employees(); track employee.id) {
+                  <option [value]="employee.id">{{ employee.name }}</option>
                 }
               </select>
             </div>
-             <div>
-              <label for="departmentName" class="block text-sm font-medium text-slate-700">New Department</label>
-              <select id="departmentName" formControlName="departmentName" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <div>
+              <label for="departmentName" class="block text-sm font-medium text-gray-700">Department</label>
+              <select id="departmentName" formControlName="departmentName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 <option [ngValue]="null" disabled>Select a department</option>
-                @for (dept of allDepartments(); track dept) {
-                  <option [value]="dept">{{ dept }}</option>
+                @for(department of flatDepartments(); track department.id) {
+                  <option [value]="department.name">{{ department.name }}</option>
                 }
               </select>
             </div>
           </div>
-          
-          <!-- Footer/Actions -->
-          <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end space-x-3">
-            <button type="button" (click)="close.emit()" class="px-4 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50">Cancel</button>
-            <button type="submit" [disabled]="assignForm.invalid" class="px-4 py-2 text-sm font-semibold text-white bg-slate-800 rounded-md shadow-sm hover:bg-slate-700 disabled:bg-slate-400 disabled:cursor-not-allowed">Assign</button>
+          <div class="mt-6 flex justify-end gap-4">
+            <button type="button" (click)="onClose()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+            <button type="submit" [disabled]="assignForm.invalid" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">Assign Employee</button>
           </div>
         </form>
       </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
 })
 export class AssignEmployeeModalComponent {
+  close = output<void>();
+  assignEmployee = output<{ employeeId: number; departmentName: string }>();
+  
   private employeeService = inject(EmployeeService);
   private departmentService = inject(DepartmentService);
-  
-  close = output<void>();
-  assign = output<{ employeeId: number; departmentName: string }>();
-  
+
   employees = this.employeeService.getEmployees();
-  
-  allDepartments = computed(() => {
-    const flattened: string[] = [];
-    const flatten = (nodes: DepartmentNode[]) => {
-        for (const node of nodes) {
-            flattened.push(node.name);
-            if (node.children) {
-                flatten(node.children);
-            }
+  private departments = this.departmentService.departmentTree;
+
+  flatDepartments = computed(() => {
+    const flatten = (nodes: DepartmentNode[]): DepartmentNode[] => {
+      let flatList: DepartmentNode[] = [];
+      for (const node of nodes) {
+        flatList.push(node);
+        if (node.children && node.children.length > 0) {
+          flatList = flatList.concat(flatten(node.children));
         }
+      }
+      return flatList;
     };
-    flatten(this.departmentService.departmentTree());
-    return flattened.sort();
+    return flatten(this.departments());
   });
 
   assignForm = new FormGroup({
-    employeeId: new FormControl(null as number | null, Validators.required),
-    departmentName: new FormControl(null as string | null, Validators.required),
+    employeeId: new FormControl<number | null>(null, Validators.required),
+    departmentName: new FormControl<string | null>(null, Validators.required),
   });
 
   onSubmit(): void {
     if (this.assignForm.invalid) {
-      this.assignForm.markAllAsTouched();
       return;
     }
-    
-    const formValue = this.assignForm.getRawValue();
-    this.assign.emit({
-      employeeId: formValue.employeeId!,
-      departmentName: formValue.departmentName!,
-    });
+    const { employeeId, departmentName } = this.assignForm.getRawValue();
+    if (employeeId && departmentName) {
+        this.assignEmployee.emit({ employeeId, departmentName });
+    }
+  }
+
+  onClose(): void {
+    this.close.emit();
   }
 }

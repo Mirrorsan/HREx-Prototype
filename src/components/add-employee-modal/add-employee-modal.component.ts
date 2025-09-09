@@ -1,123 +1,136 @@
-import { Component, ChangeDetectionStrategy, output, inject } from '@angular/core';
-// FIX: Import FormGroup and FormControl, and remove FormBuilder.
-import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { EmployeeService, NewEmployee } from '../../services/employee.service';
+import { Component, ChangeDetectionStrategy, output, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { NewEmployee, EmployeeService, Employee } from '../../services/employee.service';
 
 @Component({
   selector: 'app-add-employee-modal',
+  // FIX: Converted to an inline template as creating new files is not supported.
   template: `
-    <div class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50" (click)="close.emit()">
-      <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl relative" (click)="$event.stopPropagation()">
-        
-        <!-- Header -->
-        <div class="flex justify-between items-start mb-6">
-          <div>
-            <h2 class="text-xl font-bold text-slate-800">Add New Employee</h2>
-            <p class="text-sm text-slate-500">Enter the details for the new team member.</p>
-          </div>
-          <button (click)="close.emit()" class="p-1 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-          </button>
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold">Add New Employee</h2>
+          <button (click)="onClose()" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
         </div>
-        
-        <!-- Form -->
-        <form [formGroup]="addEmployeeForm" (ngSubmit)="onSubmit()">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-5">
+        <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
             <div>
-              <label for="name" class="block text-sm font-medium text-slate-700">Full Name</label>
-              <input id="name" type="text" formControlName="name" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+              <input type="text" id="name" formControlName="name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             </div>
-             <div>
-              <label for="nickname" class="block text-sm font-medium text-slate-700">Nickname</label>
-              <input id="nickname" type="text" formControlName="nickname" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
+
             <div>
-              <label for="email" class="block text-sm font-medium text-slate-700">Email Address</label>
-              <input id="email" type="email" formControlName="email" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label for="nickname" class="block text-sm font-medium text-gray-700">Nickname</label>
+              <input type="text" id="nickname" formControlName="nickname" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             </div>
+
             <div>
-              <label for="jobTitle" class="block text-sm font-medium text-slate-700">Job Title</label>
-              <input id="jobTitle" type="text" formControlName="jobTitle" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+              <input type="email" id="email" formControlName="email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             </div>
+
             <div>
-              <label for="department" class="block text-sm font-medium text-slate-700">Department</label>
-              <input id="department" type="text" formControlName="department" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label for="jobTitle" class="block text-sm font-medium text-gray-700">Job Title</label>
+              <input type="text" id="jobTitle" formControlName="jobTitle" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             </div>
+
             <div>
-              <label for="site" class="block text-sm font-medium text-slate-700">Site</label>
-              <input id="site" type="text" formControlName="site" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
+              <input type="text" id="department" formControlName="department" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             </div>
+
             <div>
-              <label for="manager" class="block text-sm font-medium text-slate-700">Manager</label>
-              <select id="manager" formControlName="managerId" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                <option [ngValue]="null">No Manager (e.g., CEO)</option>
-                @for (manager of managers(); track manager.id) {
+              <label for="site" class="block text-sm font-medium text-gray-700">Site</label>
+              <input type="text" id="site" formControlName="site" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            
+            <div>
+              <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+              <select id="status" formControlName="status" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                @for(status of availableStatuses; track status) {
+                  <option [value]="status">{{ status }}</option>
+                }
+              </select>
+            </div>
+            
+            <div>
+              <label for="managerId" class="block text-sm font-medium text-gray-700">Manager</label>
+              <select id="managerId" formControlName="managerId" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <option [ngValue]="null">No Manager</option>
+                @for(manager of managers(); track manager.id) {
                   <option [value]="manager.id">{{ manager.name }}</option>
                 }
               </select>
             </div>
+            
             <div>
-              <label for="startDate" class="block text-sm font-medium text-slate-700">Start Date</label>
-              <input id="startDate" type="date" formControlName="startDate" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date</label>
+              <input type="date" id="startDate" formControlName="startDate" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             </div>
-             <div class="md:col-span-2 pt-2"><hr></div>
-             <div>
-              <label for="citizenId" class="block text-sm font-medium text-slate-700">Citizen ID (Optional)</label>
-              <input id="citizenId" type="text" formControlName="citizenId" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-             <div>
-              <label for="taxId" class="block text-sm font-medium text-slate-700">Tax ID (Optional)</label>
-              <input id="taxId" type="text" formControlName="taxId" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-             <div>
-              <label for="dateOfBirth" class="block text-sm font-medium text-slate-700">Date of Birth (Optional)</label>
-              <input id="dateOfBirth" type="date" formControlName="dateOfBirth" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-          </div>
 
-          <!-- Footer/Actions -->
-          <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end space-x-3">
-            <button type="button" (click)="close.emit()" class="px-4 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50">Cancel</button>
-            <button type="submit" [disabled]="addEmployeeForm.invalid" class="px-4 py-2 text-sm font-semibold text-white bg-slate-800 rounded-md shadow-sm hover:bg-slate-700 disabled:bg-slate-400 disabled:cursor-not-allowed">Add Employee</button>
+             <div>
+              <label for="dateOfBirth" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+              <input type="date" id="dateOfBirth" formControlName="dateOfBirth" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+
+            <div>
+              <label for="citizenId" class="block text-sm font-medium text-gray-700">Citizen ID</label>
+              <input type="text" id="citizenId" formControlName="citizenId" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+
+            <div>
+              <label for="taxId" class="block text-sm font-medium text-gray-700">Tax ID</label>
+              <input type="text" id="taxId" formControlName="taxId" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+
+          </div>
+          
+          <div class="mt-6 flex justify-end gap-4">
+            <button type="button" (click)="onClose()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+            <button type="submit" [disabled]="employeeForm.invalid" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">Add Employee</button>
           </div>
         </form>
       </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
 })
 export class AddEmployeeModalComponent {
+  close = output<void>();
+  addEmployee = output<NewEmployee>();
+
   private employeeService = inject(EmployeeService);
   
-  close = output<void>();
-  add = output<NewEmployee>();
+  managers = computed(() => this.employeeService.getEmployees()().filter(e => e.jobTitle.includes('Manager') || e.jobTitle.includes('Lead') || e.jobTitle.includes('VP') || e.jobTitle.includes('CEO') || e.jobTitle.includes('CTO') || e.jobTitle.includes('Director')));
   
-  managers = this.employeeService.getEmployees();
-
-  // FIX: Use new FormGroup and new FormControl instead of FormBuilder to avoid injection issues.
-  addEmployeeForm = new FormGroup({
+  readonly availableStatuses: Employee['status'][] = ['Active', 'On Leave', 'Invited'];
+  
+  employeeForm = new FormGroup({
     name: new FormControl('', Validators.required),
-    nickname: new FormControl('', Validators.required),
+    nickname: new FormControl(''),
     email: new FormControl('', [Validators.required, Validators.email]),
     jobTitle: new FormControl('', Validators.required),
     department: new FormControl('', Validators.required),
     site: new FormControl('', Validators.required),
-    managerId: new FormControl(null as number | null),
+    status: new FormControl<Employee['status']>('Invited', Validators.required),
+    managerId: new FormControl<number | null>(null),
     startDate: new FormControl('', Validators.required),
+    avatar: new FormControl('https://i.pravatar.cc/150'),
+    dateOfBirth: new FormControl(''),
     citizenId: new FormControl(''),
     taxId: new FormControl(''),
-    dateOfBirth: new FormControl(''),
   });
 
   onSubmit(): void {
-    if (this.addEmployeeForm.invalid) {
-      this.addEmployeeForm.markAllAsTouched();
+    if (this.employeeForm.invalid) {
+      this.employeeForm.markAllAsTouched();
       return;
     }
     
-    const formValue = this.addEmployeeForm.getRawValue();
+    const formValue = this.employeeForm.getRawValue();
 
     const newEmployee: NewEmployee = {
       name: formValue.name!,
@@ -126,15 +139,19 @@ export class AddEmployeeModalComponent {
       jobTitle: formValue.jobTitle!,
       department: formValue.department!,
       site: formValue.site!,
-      status: 'Invited', // New employees are invited
+      status: formValue.status!,
       managerId: formValue.managerId ? +formValue.managerId : null,
-      startDate: new Date(formValue.startDate!).toISOString(),
-      avatar: `https://i.pravatar.cc/150?u=${formValue.email}`,
-      citizenId: formValue.citizenId || '',
-      taxId: formValue.taxId || '',
-      dateOfBirth: formValue.dateOfBirth || ''
+      startDate: formValue.startDate ? new Date(formValue.startDate).toISOString() : new Date().toISOString(),
+      avatar: `${formValue.avatar}?u=${formValue.email}`,
+      dateOfBirth: formValue.dateOfBirth ? new Date(formValue.dateOfBirth).toISOString() : undefined,
+      citizenId: formValue.citizenId || undefined,
+      taxId: formValue.taxId || undefined,
     };
+    
+    this.addEmployee.emit(newEmployee);
+  }
 
-    this.add.emit(newEmployee);
+  onClose(): void {
+    this.close.emit();
   }
 }
