@@ -38,15 +38,17 @@
 <!-- Recursive Node Template -->
 <ng-template #nodeTemplate let-node>
   <div class="node-content">
-    <div class="node-card relative inline-block bg-white rounded-lg shadow-md p-4 min-w-[220px] text-center">
-      <h3 class="font-bold text-base text-slate-800">{{ node.name }}</h3>
-      @if (node.manager) {
-        <div class="flex items-center gap-2 mt-2 justify-center">
-            <img [src]="node.manager.avatar" class="w-6 h-6 rounded-full object-cover">
-            <p class="text-xs text-slate-500">Managed by {{ node.manager.name }}</p>
+    <div class="node-card inline-block bg-white rounded-lg shadow-md p-4 min-w-[220px] text-center space-y-2">
+       <h3 class="font-bold text-slate-800">{{ node.name }}</h3>
+       @if(node.manager) {
+        <div class="flex items-center justify-center gap-2 text-xs text-slate-500">
+            <img [src]="node.manager.avatar" class="w-5 h-5 rounded-full object-cover">
+            <span>Managed by {{ node.manager.name }}</span>
         </div>
-      }
-      <p class="text-sm font-semibold text-slate-600 mt-2 bg-slate-100 inline-block px-2 py-0.5 rounded-full">{{ node.memberCount }} members</p>
+       }
+       <div class="inline-block px-3 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-700">
+         {{ node.memberCount }} {{ node.memberCount === 1 ? 'member' : 'members' }}
+       </div>
     </div>
   </div>
 

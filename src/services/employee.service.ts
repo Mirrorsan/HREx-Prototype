@@ -93,7 +93,7 @@ const MOCK_EMPLOYEES: Employee[] = [
     certificates: [{ name: 'Certified Public Accountant (CPA)', issuer: 'AICPA', issueDate: '2013-08-20', expiryDate: null }]
   },
   { 
-    id: 4, name: 'Peter Jones', nickname: 'Peter', email: 'peter.jones@example.com', jobTitle: 'Lead Engineer', department: 'Engineering', site: 'Remote', status: 'Active', managerId: 2, startDate: '2021-05-20T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=peter.jones@example.com', selected: false,
+    id: 4, name: 'Peter Jones', nickname: 'Peter', email: 'peter.jones@example.com', jobTitle: 'Frontend Lead', department: 'Frontend', site: 'Remote', status: 'Active', managerId: 2, startDate: '2021-05-20T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=peter.jones@example.com', selected: false,
     phone: '+1 555-0103', dateOfBirth: '1992-07-30', currentAddress: '101 Maple Dr, Anytown, USA 12345', permanentAddress: '101 Maple Dr, Anytown, USA 12345', citizenId: '456-789-0123', taxId: '654-321-0987', siteEmoji: '🏠', salary: '$125,000', location: 'Berlin, Germany',
     emergencyContacts: [{ name: 'Susan Jones', relationship: 'Mother', phone: '123-123-1234' }],
     employmentHistory: [{ jobTitle: 'Lead Engineer', department: 'Engineering', startDate: '2021-05-20T09:00:00Z', endDate: null }],
@@ -101,7 +101,7 @@ const MOCK_EMPLOYEES: Employee[] = [
     certificates: []
   },
   { 
-    id: 5, name: 'Mary Johnson', nickname: 'Mary', email: 'mary.johnson@example.com', jobTitle: 'Senior Engineer', department: 'Engineering', site: 'HQ', status: 'On Leave', managerId: 4, startDate: '2021-06-15T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=mary.johnson@example.com', selected: false,
+    id: 5, name: 'Mary Johnson', nickname: 'Mary', email: 'mary.johnson@example.com', jobTitle: 'Backend Lead', department: 'Backend', site: 'HQ', status: 'On Leave', managerId: 2, startDate: '2021-06-15T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=mary.johnson@example.com', selected: false,
     phone: '+1 555-0104', dateOfBirth: '1993-02-14', currentAddress: '212 Birch Rd, Anytown, USA 12345', permanentAddress: '212 Birch Rd, Anytown, USA 12345', citizenId: '567-890-1234', taxId: '543-210-9876', siteEmoji: '🏢', salary: '$110,000', location: 'Tokyo, Japan',
     emergencyContacts: [{ name: 'Robert Johnson', relationship: 'Father', phone: '234-234-2345' }],
     employmentHistory: [{ jobTitle: 'Senior Engineer', department: 'Engineering', startDate: '2021-06-15T09:00:00Z', endDate: null }],
@@ -125,7 +125,7 @@ const MOCK_EMPLOYEES: Employee[] = [
     certificates: []
   },
   { 
-    id: 8, name: 'Michael Williams', nickname: 'Mike', email: 'michael.williams@example.com', jobTitle: 'Frontend Developer', department: 'Engineering', site: 'HQ', status: 'Active', managerId: 4, startDate: '2022-09-01T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=michael.williams@example.com', selected: false,
+    id: 8, name: 'Michael Williams', nickname: 'Mike', email: 'michael.williams@example.com', jobTitle: 'Frontend Developer', department: 'Frontend', site: 'HQ', status: 'Active', managerId: 4, startDate: '2022-09-01T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=michael.williams@example.com', selected: false,
     phone: '+1 555-0107', dateOfBirth: '1996-12-24', currentAddress: '555 Redwood Blvd, Anytown, USA 12345', permanentAddress: '555 Redwood Blvd, Anytown, USA 12345', citizenId: '890-123-4567', taxId: '210-987-6543', siteEmoji: '🏢', salary: '$98,000', location: 'San Francisco, USA',
     emergencyContacts: [{ name: 'Laura Williams', relationship: 'Wife', phone: '567-567-5678' }],
     employmentHistory: [{ jobTitle: 'Frontend Developer', department: 'Engineering', startDate: '2022-09-01T09:00:00Z', endDate: null }],
@@ -165,7 +165,7 @@ const MOCK_EMPLOYEES: Employee[] = [
     certificates: []
   },
   {
-    id: 13, name: 'Kevin White', nickname: 'Kev', email: 'kevin.white@example.com', jobTitle: 'Backend Developer', department: 'Engineering', site: 'Remote', status: 'Active', managerId: 4, startDate: '2022-10-03T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=kevin.white@example.com', selected: false,
+    id: 13, name: 'Kevin White', nickname: 'Kev', email: 'kevin.white@example.com', jobTitle: 'Backend Developer', department: 'Backend', site: 'Remote', status: 'Active', managerId: 5, startDate: '2022-10-03T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=kevin.white@example.com', selected: false,
     phone: '+1 555-0112', dateOfBirth: '1995-04-12', currentAddress: '444 Pine Ln, Anytown, USA 12345', permanentAddress: '444 Pine Ln, Anytown, USA 12345', citizenId: '147-258-3690', taxId: '369-258-1470', siteEmoji: '🏠', salary: '$95,000', location: 'Portland, USA',
     emergencyContacts: [{ name: 'Susan White', relationship: 'Mother', phone: '123-456-7890' }],
     employmentHistory: [{ jobTitle: 'Backend Developer', department: 'Engineering', startDate: '2022-10-03T09:00:00Z', endDate: null }],
@@ -173,7 +173,7 @@ const MOCK_EMPLOYEES: Employee[] = [
     certificates: []
   },
   {
-    id: 14, name: 'Emily Harris', nickname: 'Em', email: 'emily.harris@example.com', jobTitle: 'DevOps Engineer', department: 'Engineering', site: 'HQ', status: 'Active', managerId: 4, startDate: '2021-11-15T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=emily.harris@example.com', selected: false,
+    id: 14, name: 'Emily Harris', nickname: 'Em', email: 'emily.harris@example.com', jobTitle: 'DevOps Lead', department: 'DevOps', site: 'HQ', status: 'Active', managerId: 2, startDate: '2021-11-15T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=emily.harris@example.com', selected: false,
     phone: '+1 555-0113', dateOfBirth: '1991-08-25', currentAddress: '555 Birch Rd, Anytown, USA 12345', permanentAddress: '555 Birch Rd, Anytown, USA 12345', citizenId: '963-852-7410', taxId: '741-852-9630', siteEmoji: '🏢', salary: '$115,000', location: 'Seattle, USA',
     emergencyContacts: [{ name: 'Daniel Harris', relationship: 'Husband', phone: '987-654-3210' }],
     employmentHistory: [{ jobTitle: 'DevOps Engineer', department: 'Engineering', startDate: '2021-11-15T09:00:00Z', endDate: null }],
@@ -181,7 +181,7 @@ const MOCK_EMPLOYEES: Employee[] = [
     certificates: [{ name: 'Docker Certified Associate', issuer: 'Docker', issueDate: '2020-10-01', expiryDate: '2024-10-01'}]
   },
   {
-    id: 15, name: 'Brian Clark', nickname: 'Brian', email: 'brian.clark@example.com', jobTitle: 'Lead QA Engineer', department: 'Engineering', site: 'HQ', status: 'Active', managerId: 2, startDate: '2021-03-22T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=brian.clark@example.com', selected: false,
+    id: 15, name: 'Brian Clark', nickname: 'Brian', email: 'brian.clark@example.com', jobTitle: 'Lead QA Engineer', department: 'QA', site: 'HQ', status: 'Active', managerId: 2, startDate: '2021-03-22T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=brian.clark@example.com', selected: false,
     phone: '+1 555-0114', dateOfBirth: '1987-02-19', currentAddress: '666 Cedar Blvd, Anytown, USA 12345', permanentAddress: '666 Cedar Blvd, Anytown, USA 12345', citizenId: '159-753-4862', taxId: '486-753-1592', siteEmoji: '🏢', salary: '$120,000', location: 'Boston, USA',
     emergencyContacts: [{ name: 'Nancy Clark', relationship: 'Wife', phone: '147-147-1471' }],
     employmentHistory: [{ jobTitle: 'Lead QA Engineer', department: 'Engineering', startDate: '2021-03-22T09:00:00Z', endDate: null }],
@@ -189,7 +189,7 @@ const MOCK_EMPLOYEES: Employee[] = [
     certificates: []
   },
   {
-    id: 16, name: 'Jessica Lewis', nickname: 'Jess', email: 'jessica.lewis@example.com', jobTitle: 'QA Tester', department: 'Engineering', site: 'Remote', status: 'Active', managerId: 15, startDate: '2023-01-09T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=jessica.lewis@example.com', selected: false,
+    id: 16, name: 'Jessica Lewis', nickname: 'Jess', email: 'jessica.lewis@example.com', jobTitle: 'QA Tester', department: 'QA', site: 'Remote', status: 'Active', managerId: 15, startDate: '2023-01-09T09:00:00Z', avatar: 'https://i.pravatar.cc/150?u=jessica.lewis@example.com', selected: false,
     phone: '+1 555-0115', dateOfBirth: '1999-05-30', currentAddress: '777 Spruce St, Anytown, USA 12345', permanentAddress: '777 Spruce St, Anytown, USA 12345', citizenId: '357-159-2486', taxId: '248-159-3576', siteEmoji: '🏠', salary: '$75,000', location: 'Denver, USA',
     emergencyContacts: [{ name: 'Paul Lewis', relationship: 'Father', phone: '258-258-2582' }],
     employmentHistory: [{ jobTitle: 'QA Tester', department: 'Engineering', startDate: '2023-01-09T09:00:00Z', endDate: null }],
